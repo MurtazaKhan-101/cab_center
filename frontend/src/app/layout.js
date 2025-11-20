@@ -3,6 +3,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
+import LayoutWrapper from "./components/layout/LayoutWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,13 +19,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <title>Auth Template - Connect & Share</title>
-        <meta name="description" content="A modern community platform" />
+        <title>Cab Centre - Your Ride, Your Way</title>
+        <meta name="description" content="Premium cab booking service" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+        </AuthProvider>
       </body>
     </html>
   );
