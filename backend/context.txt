@@ -1,0 +1,51 @@
+ok so this backend is going to be for a Booking, Drivers and Cars management system for a Cab Center Admin
+
+The required db models are Booking, Driver, Vehicle
+
+Booking Fields are going to be the following:
+1. user_id (from User model)
+2. user_name (to be supplied by user during booking)
+3. contact_number (to supplied by user during booking)
+4. email (to be supplied by user during booking)
+5. no_of_passengers (to be supplied by user during booking)
+6. special_requirements (optional, to be supplied by user during booking)
+7. pickup (to be supplied by user during booking)
+8. drop (to be supplied by user during booking)
+9. vehicle_type (to be supplied by user during booking)
+10. vehicle_id (to be set by admin when booking request is received)
+11. driver (to be set by admin when booking request is received)
+12. total_fair (going to be calculated based on selected vehicle type's fair/km and rush hours(specified by admin))
+13. Date (to be supplied by user during booking)
+14. Time (to be supplied by user during booking)
+
+Driver Fields are going to be the following:
+1. id 
+2. name 
+3. contact_number
+4. liscense_number
+5. assigned_vehicle_type (from Vehicle table)
+6. assigned_vehicle_id (from Vehicle table)
+7. total_rides
+8. monthly_presents
+9. availability_status
+10. monthly_salary
+
+Vehicle Fields are going to be the following:
+1. vehicle_type
+2. registration_number
+3. model
+4. year
+5. assigned_driver_id
+6. availability_status
+
+Requirements for the admin
+1. Admin would be able to manage the complete crud of Drivers
+2. Admin would be able to manage the complete crud of Vehicles
+3. Admin would be able to manage the bookings by either rejecting them or approve them
+4. Admin would be able to approve a booking by assigning a availaible vehicle-driver pair to the booking according to the demanded vehicle type by the user
+5. After booking approval, admin would be able to download a pdf which will be a receipt for the booking having all the necessory incformation for the driver to have that receipt and complete that ride
+6. After approval, an approval will be send to the user about the driver's arrival, and also a rejection mail if it is rejected
+7. Admin would be able to manage the fair calulcation from the booking management section by adjusting the rush hour timings and the rates of those ruch hour timings so that if the user books in those hours the rates would be added along the rates per/km of the vehicle's
+
+Requirements for the user
+1. User would be able to make bookings by providing the required information

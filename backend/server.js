@@ -25,6 +25,10 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/auth", require("./routes/googleAuthRoutes"));
+app.use("/api/bookings", require("./routes/bookingRoutes"));
+app.use("/api/drivers", require("./routes/driverRoutes"));
+app.use("/api/vehicles", require("./routes/vehicleRoutes"));
+app.use("/api/settings", require("./routes/settingsRoutes"));
 
 // Health check route
 app.get("/", (req, res) => {
