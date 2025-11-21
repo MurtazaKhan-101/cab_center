@@ -1,14 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
+import { useRouter } from "next/navigation";
 import { Button, Input, Alert, Spinner, Divider } from "../ui";
-import { ROUTES, API_BASE_URL } from "../../lib/constants";
-import Link from "next/link";
 
 export default function Login() {
-  const router = useRouter();
   const { login } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -61,11 +58,8 @@ export default function Login() {
       if (result.success) {
         setAlert({
           type: "success",
-          message: "Login successful! Redirecting...",
+          message: "Login successful!",
         });
-        setTimeout(() => {
-          window.location.href = ROUTES.DASHBOARD;
-        }, 1000);
       } else {
         setAlert({ type: "error", message: result.message || "Login failed" });
       }
@@ -77,10 +71,6 @@ export default function Login() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE_URL}/auth/google`;
   };
 
   return (
