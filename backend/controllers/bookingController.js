@@ -591,12 +591,10 @@ class BookingController {
       doc.moveDown();
 
       // Footer
-      doc
-        .fontSize(10)
-        .text("Thank you for choosing Cab Center!", {
-          align: "center",
-          italics: true,
-        });
+      doc.fontSize(10).text("Thank you for choosing Cab Center!", {
+        align: "center",
+        italics: true,
+      });
       doc.text("For any queries, please contact our support team.", {
         align: "center",
       });
