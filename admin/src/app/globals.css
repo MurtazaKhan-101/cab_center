@@ -2,19 +2,63 @@
 
 @theme {
   --color-background: #ffffff;
-  --color-foreground: #171717;
+  --color-foreground: #111827;
 
-  --gradient-sidebar: linear-gradient(#b733a7 0%, #f05d24 100%);
-  --gradient-trending: linear-gradient(90deg, #0e004c 0%, #6100a3 100%);
-  --gradient-buttons: linear-gradient(90deg, #1a94d0 0%, #a41c5e 100%);
-  --gradient-chat: linear-gradient(180deg, #1a94d0 0%, #a41c5e 100%);
-  --gradient-buttons-hover: linear-gradient(90deg, #a41c5e 0%, #1a94d0 100%);
-  --gradient-ui-cards: linear-gradient(90deg, #e01254 0%, #ffad3b 100%);
+  --gradient-sidebar: linear-gradient(90deg, #00188F 0%, #000729 100%);
+  --gradient-trending: linear-gradient(90deg, #00188F 0%, #000729 100%);
+  --gradient-buttons: linear-gradient(90deg, #00188F 0%, #000729 100%);
+  --gradient-chat: linear-gradient(180deg, #00188F 0%, #000729 100%);
+  --gradient-buttons-hover: linear-gradient(90deg, #000729 0%, #00188F 100%);
+  --gradient-ui-cards: linear-gradient(90deg, #00188F 0%, #000729 100%);
 
-  --color-auth-btn-bg: #1a94d0;
+  --color-auth-btn-bg: #00188F;
+  --color-secondary: #5C88D7;
+  --color-table-hover: #E5EAFF;
+  --color-table-border: #D1D5DB;
 }
 
 @layer base, components, utilities;
+
+/* Dark mode configuration */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #111827;
+    --color-foreground: #f9fafb;
+  }
+}
+
+.dark {
+  --color-background: #111827;
+  --color-foreground: #f9fafb;
+}
+
+/* Light mode (default) */
+:root {
+  --color-background: #f9fafb;
+  --color-foreground: #111827;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    height: 100%;
+  }
+  
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  }
+
+  /* Ensure html and body have proper dark backgrounds */
+  html.dark,
+  html.dark body {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+}
 
 /* Custom gradient utilities */
 @layer utilities {
@@ -48,8 +92,30 @@
   .bg-ui-cards-gradient {
     background: var(--gradient-ui-cards);
   }
+  .hover\:bg-ui-cards-gradient:hover {
+    background: var(--gradient-ui-cards);
+  }
   .hover\:bg-buttons-gradient:hover {
     background: var(--gradient-buttons);
+  }
+  .bg-secondary {
+    background-color: var(--color-secondary);
+  }
+  .hover\:bg-secondary:hover {
+    background-color: var(--color-secondary);
+  }
+  .bg-table-hover {
+    background-color: var(--color-table-hover);
+  }
+  .hover\:bg-table-hover:hover {
+    background-color: var(--color-table-hover);
+  }
+  .border-table {
+    border-color: var(--color-table-border);
+  }
+  .divide-table > * + * {
+    border-top-width: 1px;
+    border-color: var(--color-table-border);
   }
   .ring-buttons-gradient {
     --tw-ring-color: var(--gradient-buttons);
@@ -78,7 +144,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #111827;
     --foreground: #ededed;
   }
 }

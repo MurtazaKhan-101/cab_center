@@ -5,12 +5,12 @@ import Link from "next/link";
 
 export const AuthLayout = ({ children, title, subtitle }) => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#030303] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         {/* Reddit-style logo/branding */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-[#FF4500]">Auth Template</h1>
+            <h1 className="text-3xl font-bold text-auth-btn-bg">Cab Centre</h1>
           </Link>
         </div>
 

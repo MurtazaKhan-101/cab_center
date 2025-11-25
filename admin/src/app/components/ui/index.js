@@ -1,4 +1,4 @@
-// Button Component - Reddit style
+// Button Component - Custom style
 export const Button = ({
   children,
   onClick,
@@ -9,16 +9,17 @@ export const Button = ({
   className = "",
 }) => {
   const baseStyles =
-    "px-4 py-2 rounded-full font-bold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
+    "px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
-    primary: "bg-[#FF4500] text-white hover:bg-[#ff5414] active:bg-[#cc3700]",
+    primary: "bg-buttons-gradient text-white hover:bg-buttons-gradient-hover active:opacity-90 shadow-lg hover:shadow-xl transform hover:scale-[1.02]",
     secondary:
-      "bg-transparent border border-[#0079D3] text-[#0079D3] hover:bg-[#0079D3] hover:text-white",
+      "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary hover:text-white transition-all duration-200",
     outline:
       "bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800",
     google:
       "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700",
+    auth: "bg-auth-btn-bg text-white hover:bg-buttons-gradient transition-all duration-200 shadow-md hover:shadow-lg",
   };
 
   return (
@@ -35,7 +36,7 @@ export const Button = ({
   );
 };
 
-// Input Component - Reddit style
+// Input Component - Custom style
 export const Input = ({
   type = "text",
   placeholder,
@@ -54,11 +55,10 @@ export const Input = ({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`w-full px-4 py-3 rounded border ${
-          error
+        className={`w-full px-4 py-3 rounded border ${error
             ? "border-red-500 focus:border-red-500"
-            : "border-gray-300 dark:border-gray-600 focus:border-[#0079D3]"
-        } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#0079D3] focus:ring-opacity-50 transition-all ${className}`}
+            : "border-gray-300 dark:border-gray-600 focus:border-secondary"
+        } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50 transition-all ${className}`}
         {...props}
       />
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
@@ -66,25 +66,31 @@ export const Input = ({
   );
 };
 
-// Card Component - Reddit style
-export const Card = ({ children, className = "" }) => {
+// Card Component - Custom style
+export const Card = ({ children, className = "", variant = "default" }) => {
+  const variants = {
+    default: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg",
+    gradient: "bg-ui-cards-gradient text-white rounded-xl shadow-lg",
+    secondary: "bg-secondary text-white rounded-xl shadow-lg",
+  };
+
   return (
     <div
-      className={`bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-md shadow-sm ${className}`}
+      className={`${variants[variant]} ${className}`}
     >
       {children}
     </div>
   );
 };
 
-// Alert Component - Reddit style
+// Alert Component - Custom style
 export const Alert = ({ type = "info", message, onClose }) => {
   const types = {
     success:
       "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200",
     error:
       "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200",
-    info: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200",
+    info: "bg-blue-50 dark:bg-blue-900/20 border-secondary dark:border-secondary text-blue-800 dark:text-blue-200",
     warning:
       "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200",
   };
@@ -103,7 +109,7 @@ export const Alert = ({ type = "info", message, onClose }) => {
   );
 };
 
-// Loading Spinner - Reddit style
+// Loading Spinner - Custom style
 export const Spinner = ({ size = "md", className = "" }) => {
   const sizes = {
     sm: "w-4 h-4 border-2",
@@ -113,17 +119,17 @@ export const Spinner = ({ size = "md", className = "" }) => {
 
   return (
     <div
-      className={`${sizes[size]} border-gray-200 border-t-[#FF4500] rounded-full animate-spin ${className}`}
+      className={`${sizes[size]} border-gray-200 border-t-secondary rounded-full animate-spin ${className}`}
     ></div>
   );
 };
 
-// Link Component - Reddit style
+// Link Component - Custom style
 export const Link = ({ href, children, className = "" }) => {
   return (
     <a
       href={href}
-      className={`text-[#0079D3] hover:underline text-sm ${className}`}
+      className={`text-secondary hover:underline text-sm ${className}`}
     >
       {children}
     </a>
