@@ -112,7 +112,7 @@ export default function BookingDetailsModal({ isOpen, onClose, booking }) {
               <MapPin className="w-4 h-4" />
               <span>Trip Information</span>
             </h4>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Pickup Location</label>
                 <p className="text-gray-900 dark:text-gray-100">{booking.pickupPoint}</p>
@@ -121,41 +121,37 @@ export default function BookingDetailsModal({ isOpen, onClose, booking }) {
                 <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Drop Location</label>
                 <p className="text-gray-900 dark:text-gray-100">{booking.dropPoint}</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Vehicle Type</label>
-                  <p className="text-gray-900 dark:text-gray-100 flex items-center space-x-1">
-                    <Car className="w-3 h-3" />
-                    <span>{booking.vehicle}</span>
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Date</label>
-                  <p className="text-gray-900 dark:text-gray-100 flex items-center space-x-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>{booking.date}</span>
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Time</label>
-                  <p className="text-gray-900 dark:text-gray-100 flex items-center space-x-1">
-                    <Clock className="w-3 h-3" />
-                    <span>{booking.time}</span>
-                  </p>
-                </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Vehicle Type</label>
+                <p className="text-gray-900 dark:text-gray-100 flex items-center space-x-1">
+                  <Car className="w-3 h-3" />
+                  <span>{booking.vehicle}</span>
+                </p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Distance</label>
-                  <p className="text-gray-900 dark:text-gray-100">{booking.distance}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Estimated Fare</label>
-                  <p className="text-gray-900 dark:text-gray-100 flex items-center space-x-1">
-                    <CreditCard className="w-3 h-3" />
-                    <span>{booking.estimatedFare}</span>
-                  </p>
-                </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Date</label>
+                <p className="text-gray-900 dark:text-gray-100 flex items-center space-x-1">
+                  <Calendar className="w-3 h-3" />
+                  <span>{booking.date}</span>
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Time</label>
+                <p className="text-gray-900 dark:text-gray-100 flex items-center space-x-1">
+                  <Clock className="w-3 h-3" />
+                  <span>{booking.time}</span>
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Distance</label>
+                <p className="text-gray-900 dark:text-gray-100">{booking.distance}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Estimated Fare</label>
+                <p className="text-gray-900 dark:text-gray-100 flex items-center space-x-1">
+                  <CreditCard className="w-3 h-3" />
+                  <span>{booking.estimatedFare}</span>
+                </p>
               </div>
             </div>
           </div>
