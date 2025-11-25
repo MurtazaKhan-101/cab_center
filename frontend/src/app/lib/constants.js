@@ -20,6 +20,19 @@ export const API_ENDPOINTS = {
   GOOGLE_AUTH: "/auth/google",
   GOOGLE_CALLBACK: "/auth/google/callback",
   GOOGLE_REFRESH_TOKEN: "/auth/google/refresh-token",
+
+  // Booking endpoints (User)
+  CREATE_BOOKING: "/api/bookings",
+  MY_BOOKINGS: "/api/bookings/my-bookings",
+  CANCEL_BOOKING: (id) => `/api/bookings/${id}/cancel`,
+  GET_BOOKING: (id) => `/api/bookings/${id}`,
+
+  // Vehicle endpoints (Public)
+  VEHICLE_TYPES: "/api/vehicles/types",
+
+  // Settings endpoints (Public)
+  GET_SETTINGS: "/api/settings",
+  GET_RUSH_HOURS: "/api/settings/rush-hours",
 };
 
 // Local Storage Keys
@@ -38,6 +51,26 @@ export const ROUTES = {
   RESET_PASSWORD: "/auth/reset-password",
   OAUTH_SUCCESS: "/auth/oauth-success",
   DASHBOARD: "/dashboard",
+  BOOKING: "/booking",
+  HISTORY: "/history",
+};
+
+// Booking Status
+export const BOOKING_STATUS = {
+  PENDING: "pending",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+};
+
+// Vehicle Types
+export const VEHICLE_TYPES = {
+  SEDAN: "sedan",
+  SUV: "suv",
+  LUXURY: "luxury",
+  VAN: "van",
+  MINI: "mini",
 };
 
 // Error Messages

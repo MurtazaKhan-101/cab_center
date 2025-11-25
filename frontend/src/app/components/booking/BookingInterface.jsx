@@ -1,11 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { MapPin, Calendar, Clock, User, Phone, Mail, Users, MessageSquare } from "lucide-react";
-import { Button, Input, Alert } from "../ui";
+import { useState, useEffect } from "react";
+import {
+  MapPin,
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Mail,
+  Users,
+  MessageSquare,
+} from "lucide-react";
+import { Button, Input, Alert, Spinner } from "../ui";
 import Image from "next/image";
+import { useAuth } from "../../context/AuthContext";
+import { createBooking } from "../../lib/booking";
+import { getVehicleTypes } from "../../lib/vehicle";
 
 export default function BookingInterface() {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     from: "",
     to: "",
@@ -13,49 +26,102 @@ export default function BookingInterface() {
     time: "",
     passengerName: "",
     contactNumber: "",
-    email: "",
+    email: user?.email || "",
     numberOfPassengers: "",
     specialRequirements: "",
-    selectedVehicle: null
+    selectedVehicle: null,
+    distanceKm: "",
   });
 
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  const vehicles = [
-    {
-      id: "sedan",
-      name: "Sedan",
-      price: "SAR 110",
-      image: "/images/sedan.svg",
-      seats: 4,
-      capacity: "4 seats"
-    },
-    {
-      id: "suv",
-      name: "SUV", 
-      price: "SAR 170",
-      image: "/images/suv.svg",
-      seats: 6,
-      capacity: "6 seats"
-    },
-    {
-      id: "mini-van",
-      name: "Mini Van",
-      price: "SAR 220", 
-      image: "/images/hiace.svg",
-      seats: 14,
-      capacity: "14 seats"
-    },
-  
-  ];
+  // Fetch vehicle types on mount
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      const fallbackVehicles = [
+        {
+          id: "sedan",
+          name: "Sedan",
+          price: "PKR 50/km",
+          farePerKm: 50,
+          image: "/images/sedan.svg",
+          seats: 4,
+          capacity: "4 seats",
+        },
+        {
+          id: "suv",
+          name: "SUV",
+          price: "PKR 80/km",
+          farePerKm: 80,
+          image: "/images/suv.svg",
+          seats: 6,
+          capacity: "6 seats",
+        },
+        {
+          id: "luxury",
+          name: "Luxury",
+          price: "PKR 150/km",
+          farePerKm: 150,
+          image: "/images/hiace.svg",
+          seats: 4,
+          capacity: "4 seats",
+        },
+      ];
+
+      try {
+        const response = await getVehicleTypes();
+        if (
+          response.success &&
+          response.vehicleTypes &&
+          response.vehicleTypes.length > 0
+        ) {
+          // Map backend vehicle data to frontend format
+          const vehicleData = response.vehicleTypes.map((v) => ({
+            id: v.vehicle_type,
+            name:
+              v.vehicle_type.charAt(0).toUpperCase() + v.vehicle_type.slice(1),
+            price: `PKR ${v.fare_per_km}/km`,
+            farePerKm: v.fare_per_km,
+            image: `/images/${v.vehicle_type}.svg`,
+            seats: v.capacity,
+            capacity: `${v.capacity} seats`,
+            available: v.available_count,
+          }));
+          setVehicles(vehicleData);
+        } else {
+          // Use fallback if backend returns empty array
+          console.log("No vehicle types from backend, using fallback");
+          setVehicles(fallbackVehicles);
+        }
+      } catch (error) {
+        console.error("Error fetching vehicles:", error);
+        // Fallback to default vehicles if API fails
+        setVehicles(fallbackVehicles);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
+
+  // Update email when user changes
+  useEffect(() => {
+    if (user?.email && !formData.email) {
+      setFormData((prev) => ({ ...prev, email: user.email }));
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
     // Clear alert when user makes changes
     if (alert) {
@@ -64,13 +130,13 @@ export default function BookingInterface() {
   };
 
   const handleVehicleSelect = (vehicleId) => {
-    setFormData(prev => ({ 
-      ...prev, 
-      selectedVehicle: prev.selectedVehicle === vehicleId ? null : vehicleId 
+    setFormData((prev) => ({
+      ...prev,
+      selectedVehicle: prev.selectedVehicle === vehicleId ? null : vehicleId,
     }));
     // Clear vehicle selection error
     if (errors.selectedVehicle) {
-      setErrors(prev => ({ ...prev, selectedVehicle: "" }));
+      setErrors((prev) => ({ ...prev, selectedVehicle: "" }));
     }
     if (alert) {
       setAlert(null);
@@ -100,7 +166,7 @@ export default function BookingInterface() {
       const selectedDate = new Date(formData.date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       if (selectedDate < today) {
         newErrors.date = "Date cannot be in the past";
       }
@@ -112,7 +178,7 @@ export default function BookingInterface() {
     } else if (formData.date) {
       const selectedDateTime = new Date(`${formData.date}T${formData.time}`);
       const now = new Date();
-      
+
       if (selectedDateTime <= now) {
         newErrors.time = "Time must be in the future";
       }
@@ -130,8 +196,11 @@ export default function BookingInterface() {
     // Contact number validation
     if (!formData.contactNumber.trim()) {
       newErrors.contactNumber = "Contact number is required";
-    } else if (!/^\+966[0-9]{9}$/.test(formData.contactNumber.replace(/\s/g, ''))) {
-      newErrors.contactNumber = "Please enter a valid Saudi mobile number (+966XXXXXXXXX)";
+    } else if (
+      !/^(\+92|0)[0-9]{10}$/.test(formData.contactNumber.replace(/\s/g, ""))
+    ) {
+      newErrors.contactNumber =
+        "Please enter a valid Pakistani mobile number (+92XXXXXXXXXX or 03XXXXXXXXX)";
     }
 
     // Email validation
@@ -148,13 +217,27 @@ export default function BookingInterface() {
       const passengerCount = parseInt(formData.numberOfPassengers);
       if (isNaN(passengerCount) || passengerCount < 1) {
         newErrors.numberOfPassengers = "Must be at least 1 passenger";
-      } else if (passengerCount > 14) {
-        newErrors.numberOfPassengers = "Maximum 14 passengers allowed";
+      } else if (passengerCount > 20) {
+        newErrors.numberOfPassengers = "Maximum 20 passengers allowed";
       } else if (formData.selectedVehicle) {
-        const selectedVehicle = vehicles.find(v => v.id === formData.selectedVehicle);
+        const selectedVehicle = vehicles.find(
+          (v) => v.id === formData.selectedVehicle
+        );
         if (selectedVehicle && passengerCount > selectedVehicle.seats) {
           newErrors.numberOfPassengers = `Selected vehicle can only accommodate ${selectedVehicle.seats} passengers`;
         }
+      }
+    }
+
+    // Distance validation
+    if (!formData.distanceKm.trim()) {
+      newErrors.distanceKm = "Estimated distance is required";
+    } else {
+      const distance = parseFloat(formData.distanceKm);
+      if (isNaN(distance) || distance <= 0) {
+        newErrors.distanceKm = "Distance must be a positive number";
+      } else if (distance > 1000) {
+        newErrors.distanceKm = "Maximum distance is 1000 km";
       }
     }
 
@@ -167,27 +250,82 @@ export default function BookingInterface() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleBookRide = () => {
+  const handleBookRide = async () => {
     setAlert(null);
-    
+
     if (!validateForm()) {
       setAlert({
         type: "error",
-        message: "Please correct the errors below and try again."
+        message: "Please correct the errors below and try again.",
       });
       return;
     }
 
-    // If validation passes, proceed with booking
-    setAlert({
-      type: "success",
-      message: "Booking request submitted successfully! You will receive a confirmation shortly."
-    });
-    
-    console.log("Booking data:", formData);
-    // Handle booking submission here
-    // TODO: Implement actual booking API call
+    setSubmitting(true);
+
+    try {
+      // Prepare booking data for API
+      const bookingData = {
+        user_name: formData.passengerName.trim(),
+        contact_number: formData.contactNumber.trim(),
+        email: formData.email.trim(),
+        no_of_passengers: parseInt(formData.numberOfPassengers),
+        special_requirements: formData.specialRequirements.trim(),
+        pickup: formData.from.trim(),
+        drop: formData.to.trim(),
+        distance_km: parseFloat(formData.distanceKm),
+        vehicle_type: formData.selectedVehicle,
+        date: formData.date,
+        time: formData.time,
+      };
+
+      const response = await createBooking(bookingData);
+
+      if (response.success) {
+        setAlert({
+          type: "success",
+          message: `Booking request submitted successfully! Estimated fare: PKR ${response.booking.total_fare}. You will receive a confirmation via email shortly.`,
+        });
+
+        // Reset form
+        setFormData({
+          from: "",
+          to: "",
+          date: "",
+          time: "",
+          passengerName: "",
+          contactNumber: "",
+          email: user?.email || "",
+          numberOfPassengers: "",
+          specialRequirements: "",
+          selectedVehicle: null,
+          distanceKm: "",
+        });
+      } else {
+        setAlert({
+          type: "error",
+          message:
+            response.message || "Failed to submit booking. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      setAlert({
+        type: "error",
+        message: error.message || "Failed to submit booking. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-2 sm:p-4">
@@ -198,15 +336,15 @@ export default function BookingInterface() {
             <div className="relative h-[300px] sm:h-[400px] lg:h-full">
               {/* Map Container */}
               <div className="absolute inset-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                <Image 
-                  src="/images/map.svg" 
+                <Image
+                  src="/images/map.svg"
                   alt="Map"
                   width={400}
                   height={400}
                   className="w-full h-full object-cover opacity-50"
                 />
               </div>
-              
+
               {/* Route Visualization */}
               <div className="absolute inset-4 flex flex-col justify-between">
                 {/* Destination */}
@@ -224,7 +362,7 @@ export default function BookingInterface() {
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
               Book Your Ride
             </h2>
-            
+
             {/* Alert */}
             {alert && (
               <div className="mb-4">
@@ -235,7 +373,7 @@ export default function BookingInterface() {
                 />
               </div>
             )}
-            
+
             <div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4">
               {/* Location Fields */}
               <div className="space-y-2 sm:space-y-3">
@@ -261,6 +399,21 @@ export default function BookingInterface() {
                     onChange={handleChange}
                     error={errors.to}
                     className="pl-10 sm:pl-12"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Estimated Distance (km):
+                  </label>
+                  <Input
+                    type="number"
+                    name="distanceKm"
+                    placeholder="e.g. 15"
+                    value={formData.distanceKm}
+                    onChange={handleChange}
+                    error={errors.distanceKm}
+                    min="0"
+                    step="0.1"
                   />
                 </div>
               </div>
@@ -329,7 +482,7 @@ export default function BookingInterface() {
                     <Input
                       type="tel"
                       name="contactNumber"
-                      placeholder="+966XXXXXXXXX"
+                      placeholder="+92XXXXXXXXXX or 03XXXXXXXXX"
                       value={formData.contactNumber}
                       onChange={handleChange}
                       error={errors.contactNumber}
@@ -426,18 +579,22 @@ export default function BookingInterface() {
                           </div>
                         </div>
                         <div className="space-y-0.5">
-                          <h3 className={`font-semibold text-xs ${
-                            formData.selectedVehicle === vehicle.id 
-                              ? "text-white" 
-                              : "text-gray-900 dark:text-white"
-                          }`}>
+                          <h3
+                            className={`font-semibold text-xs ${
+                              formData.selectedVehicle === vehicle.id
+                                ? "text-white"
+                                : "text-gray-900 dark:text-white"
+                            }`}
+                          >
                             {vehicle.name}
                           </h3>
-                          <p className={`text-xs ${
-                            formData.selectedVehicle === vehicle.id 
-                              ? "text-white" 
-                              : "text-gray-900 dark:text-white"
-                          }`}>
+                          <p
+                            className={`text-xs ${
+                              formData.selectedVehicle === vehicle.id
+                                ? "text-white"
+                                : "text-gray-900 dark:text-white"
+                            }`}
+                          >
                             {vehicle.price}
                           </p>
                         </div>
@@ -445,21 +602,37 @@ export default function BookingInterface() {
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Vehicle selection error */}
                 {errors.selectedVehicle && (
-                  <p className="mt-1 text-sm text-red-500">{errors.selectedVehicle}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.selectedVehicle}
+                  </p>
                 )}
-                
+
                 {/* Selected vehicle info */}
                 {formData.selectedVehicle && (
                   <div className="mt-3 p-2 bg-auth-btn-bg/5 border border-auth-btn-bg/20 rounded-lg">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-auth-btn-bg rounded-full flex-shrink-0"></div>
                       <span className="text-xs font-medium text-auth-btn-bg dark:text-gray-300">
-                        {vehicles.find(v => v.id === formData.selectedVehicle)?.name} - 
-                        {vehicles.find(v => v.id === formData.selectedVehicle)?.capacity} - 
-                        {vehicles.find(v => v.id === formData.selectedVehicle)?.price}
+                        {
+                          vehicles.find(
+                            (v) => v.id === formData.selectedVehicle
+                          )?.name
+                        }{" "}
+                        -
+                        {
+                          vehicles.find(
+                            (v) => v.id === formData.selectedVehicle
+                          )?.capacity
+                        }{" "}
+                        -
+                        {
+                          vehicles.find(
+                            (v) => v.id === formData.selectedVehicle
+                          )?.price
+                        }
                       </span>
                     </div>
                   </div>
@@ -471,9 +644,17 @@ export default function BookingInterface() {
             <div className="pt-3 sm:pt-4 mt-auto">
               <Button
                 onClick={handleBookRide}
-                className="w-full bg-buttons-gradient hover:bg-buttons-gradient-hover text-white py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                disabled={submitting}
+                className="w-full bg-buttons-gradient hover:bg-buttons-gradient-hover text-white py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Book Ride
+                {submitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Spinner size="sm" />
+                    Submitting...
+                  </span>
+                ) : (
+                  "Book Ride"
+                )}
               </Button>
             </div>
           </div>
