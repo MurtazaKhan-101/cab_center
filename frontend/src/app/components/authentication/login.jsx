@@ -90,38 +90,24 @@ export default function Login() {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#00188F] to-[#000729] items-center justify-center p-12">
         <div className="text-center text-white max-w-md">
           <div className="mb-8">
-           <img
-            src="/images/logo.svg"
-            alt="Cab Center"
-            className="mx-auto mb-6"
-            width={120}
-            height={120}
-          />
-
+            <img
+              src="/images/logo.svg"
+              alt="Cab Center"
+              className="mx-auto mb-6"
+              width={120}
+              height={120}
+            />
           </div>
           <h1 className="text-4xl font-bold mb-4">Welcome Back</h1>
           <p className="text-xl opacity-90 mb-8">
             Sign in to access your account and book your next ride
           </p>
-          <div className="flex justify-center gap-4 mb-8">
-        
-          </div>
-            <div className="flex justify-center gap-4 mb-8 ">
+          <div className="flex justify-center gap-4 mb-8"></div>
+          <div className="flex justify-center gap-4 mb-8 ">
+            <img src="/images/sedan.svg" alt="Sedan" width={76} height={76} />
+            <img src="/images/suv.svg " alt="SUV" width={76} height={76} />
             <img
-              src="/images/sedan.svg"
-              alt="Sedan"
-              width={76}
-              height={76}
-         
-            />
-            <img
-              src="/images/suv.svg "
-              alt="SUV"
-             width={76}
-              height={76}
-            />
-            <img
-              src="/images/hiace.svg"
+              src="/images/mini van.svg"
               alt="Hiace"
               width={76}
               height={76}
@@ -177,8 +163,18 @@ export default function Login() {
               {/* Email Field */}
               <div className="relative">
                 <div className="absolute left-3 top-3 pointer-events-none z-10">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
                   </svg>
                 </div>
                 <Input
@@ -196,8 +192,18 @@ export default function Login() {
               {/* Password Field */}
               <div className="relative">
                 <div className="absolute left-3 top-3 pointer-events-none z-10">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
                   </svg>
                 </div>
                 <Input

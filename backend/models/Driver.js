@@ -22,7 +22,7 @@ const driverSchema = new mongoose.Schema(
     },
     assigned_vehicle_type: {
       type: String,
-      enum: ["sedan", "suv", "luxury", "van", "mini", null],
+      enum: ["sedan", "suv", "luxury", "van", "mini van", null],
       default: null,
     },
     assigned_vehicle_id: {
