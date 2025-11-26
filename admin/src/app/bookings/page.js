@@ -383,7 +383,7 @@ export default function BookingsPage() {
       
       showToast.success("Booking rejected successfully!", toastId);
     } catch (error) {
-      showToast.error("Failed to reject booking. Please try again.", toastId);
+      showToast.error("Failed to reject booking. Please try again.", toastId);       
     }
   };
 

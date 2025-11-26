@@ -294,7 +294,7 @@ Response: {
   "settings": {
     "rush_hours": [...],
     "base_fare": 50,
-    "currency": "PKR"
+    "currency": "SAR"
   }
 }
 ```
@@ -353,7 +353,7 @@ Headers: Authorization: Bearer <admin_token>
 PATCH /api/settings/currency
 Headers: Authorization: Bearer <admin_token>
 Body: {
-  "currency": "USD"
+  "currency": "SAR"
 }
 ```
 

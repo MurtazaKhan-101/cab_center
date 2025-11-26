@@ -106,7 +106,7 @@ export default function DriverProfile({ driver, onBack, onEdit, onDelete, onSave
         {/* Total Rides Card */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg bg-ui-cards-gradient text-white transition-all duration-300 group cursor-pointer">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-white/20 dark:bg-blue-900 group-hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors">
+            <div className="w-12 h-12 bg-white/20 dark:bg-blue-900 rounded-lg flex items-center justify-center transition-colors">
               <Car className="w-6 h-6 text-white dark:text-blue-400 group-hover:text-white" />
             </div>
             <div className="text-right">

@@ -11,7 +11,7 @@ class SettingsController {
         settings = new Settings({
           rush_hours: [],
           base_fare: 50,
-          currency: "PKR",
+          currency: "SAR",
         });
         await settings.save();
       }

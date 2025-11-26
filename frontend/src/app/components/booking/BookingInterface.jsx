@@ -46,7 +46,7 @@ export default function BookingInterface() {
         {
           id: "sedan",
           name: "Sedan",
-          price: "PKR 50/km",
+          price: "SAR 50/km",
           farePerKm: 50,
           image: "/images/sedan.svg",
           seats: 4,
@@ -55,16 +55,16 @@ export default function BookingInterface() {
         {
           id: "suv",
           name: "SUV",
-          price: "PKR 80/km",
+          price: "SAR 80/km",
           farePerKm: 80,
           image: "/images/suv.svg",
           seats: 6,
           capacity: "6 seats",
         },
         {
-          id: "luxury",
-          name: "Luxury",
-          price: "PKR 150/km",
+          id: "mini van",
+          name: "Mini Van",
+          price: "SAR 150/km",
           farePerKm: 150,
           image: "/images/hiace.svg",
           seats: 4,
@@ -84,7 +84,7 @@ export default function BookingInterface() {
             id: v.vehicle_type,
             name:
               v.vehicle_type.charAt(0).toUpperCase() + v.vehicle_type.slice(1),
-            price: `PKR ${v.fare_per_km}/km`,
+            price: `SAR ${v.fare_per_km}/km`,
             farePerKm: v.fare_per_km,
             image: `/images/${v.vehicle_type}.svg`,
             seats: v.capacity,
@@ -200,7 +200,7 @@ export default function BookingInterface() {
       !/^(\+92|0)[0-9]{10}$/.test(formData.contactNumber.replace(/\s/g, ""))
     ) {
       newErrors.contactNumber =
-        "Please enter a valid Pakistani mobile number (+92XXXXXXXXXX or 03XXXXXXXXX)";
+        "Please enter a valid Saudi Arabian mobile number (+966XXXXXXXXXX)";
     }
 
     // Email validation
@@ -284,7 +284,7 @@ export default function BookingInterface() {
       if (response.success) {
         setAlert({
           type: "success",
-          message: `Booking request submitted successfully! Estimated fare: PKR ${response.booking.total_fare}. You will receive a confirmation via email shortly.`,
+          message: `Booking request submitted successfully! Estimated fare: SAR ${response.booking.total_fare}. You will receive a confirmation via email shortly.`,
         });
 
         // Reset form

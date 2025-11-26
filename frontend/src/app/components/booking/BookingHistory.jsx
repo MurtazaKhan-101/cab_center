@@ -186,7 +186,7 @@ export const BookingHistory = () => {
                     } backdrop-blur-sm rounded-lg px-3 py-1.5 sm:inline-block w-full sm:w-auto text-center`}
                   >
                     <p className="text-base sm:text-lg font-bold">
-                      PKR {booking.total_fare}
+                      SAR {booking.total_fare}
                     </p>
                   </div>
                 </div>

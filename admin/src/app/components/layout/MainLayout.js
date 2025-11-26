@@ -32,7 +32,7 @@ const MainLayout = ({ children }) => {
         title="Admin Dashboard"
         className="text-auth-btn-bg"
         />
-
+      
 
         {/* Main content */}
         <main className="flex-1 overflow-y-auto focus:outline-none">

@@ -92,7 +92,7 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
             )}
             <div className="text-white">
               <span className="text-sm hidden sm:flex font-medium text-gray-200 dark:text-gray-100">
-                  {user.firstName} {user.lastName}
+                  {user.firstName} 
               </span>   
               <p className="text-xs text-gray-200">{user.email}</p>
             </div>
