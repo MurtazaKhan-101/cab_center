@@ -5,7 +5,7 @@ const vehicleSchema = new mongoose.Schema(
     vehicle_type: {
       type: String,
       required: true,
-      enum: ["sedan", "suv", "luxury", "van", "mini"],
+      enum: ["sedan", "suv", "luxury", "van", "mini van"],
     },
     registration_number: {
       type: String,

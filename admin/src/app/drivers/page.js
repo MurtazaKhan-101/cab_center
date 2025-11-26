@@ -9,11 +9,21 @@ import MainLayout from "../components/layout/MainLayout";
 import AddDriverModal from "./AddDriverModal";
 import DriverProfile from "./DriverProfile";
 import { showToast } from "../lib/toast";
-import { Edit, Eye, Trash2, Plus, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Edit,
+  Eye,
+  Trash2,
+  Plus,
+  Search,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import * as driverService from "../lib/driver";
 
 export default function DriversPage() {
   const router = useRouter();
-  const { user, loading, logout, isAuthenticated } = useAuth();
+  const { user, loading: authLoading, logout, isAuthenticated } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,150 +32,57 @@ export default function DriversPage() {
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState(null);
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'profile'
+  const [viewMode, setViewMode] = useState("list"); // 'list' or 'profile'
   const [isEditMode, setIsEditMode] = useState(false);
-  const [drivers, setDrivers] = useState([
-    {
-      id: 1,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-01-15",
-      rating: 4.8
-    },
-    {
-      id: 2,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-01-20",
-      rating: 4.6
-    },
-    {
-      id: 3,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-02-01",
-      rating: 4.9
-    },
-    {
-      id: 4,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-02-10",
-      rating: 4.7
-    },
-    {
-      id: 5,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-02-15",
-      rating: 4.5
-    },
-    {
-      id: 6,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-02-20",
-      rating: 4.8
-    },
-    {
-      id: 7,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-02-25",
-      rating: 4.6
-    },
-    {
-      id: 8,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Not Available",
-      joinDate: "2024-03-01",
-      rating: 4.9
-    },
-    {
-      id: 9,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Not Available",
-      joinDate: "2024-03-05",
-      rating: 4.4
-    },
-    {
-      id: 10,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-03-10",
-      rating: 4.7
-    },
-    {
-      id: 11,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-03-15",
-      rating: 4.8
-    },
-    {
-      id: 12,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-03-20",
-      rating: 4.5
-    },
-    {
-      id: 13,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-03-25",
-      rating: 4.9
-    },
-    {
-      id: 14,
-      name: "Ahmed",
-      licenseNumber: "KSA 2370",
-      contact: "+9665151212",
-      assignedVehicle: "Hyundai Sitaria",
-      availability: "Available",
-      joinDate: "2024-03-30",
-      rating: 4.6
-    }
-  ]);
+  const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch drivers from backend
+  useEffect(() => {
+    const fetchDrivers = async () => {
+      if (authLoading) return;
+
+      if (!isAuthenticated) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await driverService.getAllDrivers();
+        if (response.success) {
+          const transformedDrivers = response.drivers.map((d) => ({
+            id: d._id,
+            name: d.name,
+            licenseNumber: d.license_number,
+            contact: d.contact_number,
+            assignedVehicle: d.assigned_vehicle_id
+              ? `${d.assigned_vehicle_id.model} - ${d.assigned_vehicle_id.registration_number}`
+              : "Not Assigned",
+            availability:
+              d.availability_status === "available"
+                ? "Available"
+                : "Not Available",
+            joinDate: new Date(d.createdAt).toLocaleDateString("en-GB"),
+            rating: 4.5,
+            status: d.availability_status,
+            vehicleId: d.assigned_vehicle_id?._id,
+            monthlySalary: d.monthly_salary,
+            assignedVehicleType: d.assigned_vehicle_type,
+            totalRides: d.total_rides || 0,
+            monthlyPresents: d.monthly_presents || 0,
+          }));
+          setDrivers(transformedDrivers);
+        }
+      } catch (error) {
+        console.error("Error fetching drivers:", error);
+        showToast.error("Failed to load drivers");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDrivers();
+  }, [authLoading, isAuthenticated]);
 
   useEffect(() => {
     setMounted(true);
@@ -178,14 +95,16 @@ export default function DriversPage() {
   }, [mounted, loading, isAuthenticated, router]);
 
   // Filter drivers based on search term and status
-  const filteredDrivers = drivers.filter(driver => {
-    const matchesSearch = driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredDrivers = drivers.filter((driver) => {
+    const matchesSearch =
+      driver.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       driver.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       driver.contact.includes(searchTerm) ||
       driver.assignedVehicle.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === "" || driver.availability === statusFilter;
-    
+
+    const matchesStatus =
+      statusFilter === "" || driver.availability === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -194,20 +113,6 @@ export default function DriversPage() {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
 
-  // Add Driver Modal Handlers
-  const handleAddDriver = (newDriverData) => {
-    // In real app, this would make an API call
-    const newDriver = {
-      id: drivers.length + 1,
-      ...newDriverData,
-      joinDate: new Date().toISOString().split('T')[0],
-      rating: 0
-    };
-    setDrivers(prev => [...prev, newDriver]);
-    showToast.success(`Driver "${newDriverData.name}" has been added successfully!`);
-    console.log('Driver added:', newDriver);
-  };
-
   const handleCloseModal = () => {
     setShowAddDriverModal(false);
   };
@@ -215,48 +120,161 @@ export default function DriversPage() {
   // Driver Profile Handlers
   const handleViewDriver = (driver) => {
     setSelectedDriver(driver);
-    setViewMode('profile');
+    setViewMode("profile");
     setIsEditMode(false);
   };
 
   const handleEditDriverProfile = (driver) => {
     setSelectedDriver(driver);
-    setViewMode('profile');
+    setViewMode("profile");
     setIsEditMode(true);
   };
 
   const handleBackToList = () => {
     setSelectedDriver(null);
-    setViewMode('list');
+    setViewMode("list");
     setIsEditMode(false);
   };
 
-  const handleEditDriver = (updatedDriver) => {
-    setDrivers(prev => prev.map(driver => 
-      driver.id === updatedDriver.id ? updatedDriver : driver
-    ));
-    showToast.success(`Driver "${updatedDriver.name}" has been updated successfully!`);
-    console.log('Driver updated:', updatedDriver);
+  const handleSaveDriver = async (updatedDriver) => {
+    try {
+      const updateData = {
+        name: updatedDriver.name,
+        contact_number: updatedDriver.contact,
+        license_number: updatedDriver.licenseNumber,
+        monthly_salary: parseFloat(updatedDriver.monthlySalary) || 0,
+        availability_status: updatedDriver.availability,
+      };
+
+      // Handle vehicle assignment
+      if (updatedDriver.assignedVehicleId) {
+        updateData.assigned_vehicle_id = updatedDriver.assignedVehicleId;
+        updateData.assigned_vehicle_type =
+          updatedDriver.vehicleCategory?.toLowerCase();
+      } else {
+        // Explicitly remove vehicle assignment
+        updateData.assigned_vehicle_id = null;
+        updateData.assigned_vehicle_type = null;
+      }
+
+      const response = await driverService.updateDriver(
+        updatedDriver.id,
+        updateData
+      );
+
+      if (response.success) {
+        // Transform the response back to frontend format
+        const transformedDriver = {
+          id: response.driver._id,
+          name: response.driver.name,
+          licenseNumber: response.driver.license_number,
+          contact: response.driver.contact_number,
+          assignedVehicle: response.driver.assigned_vehicle_id
+            ? `${response.driver.assigned_vehicle_id.model} - ${response.driver.assigned_vehicle_id.registration_number}`
+            : "Not Assigned",
+          availability:
+            response.driver.availability_status === "available"
+              ? "Available"
+              : "Not Available",
+          joinDate: updatedDriver.joinDate,
+          rating: updatedDriver.rating,
+          status: response.driver.availability_status,
+          vehicleId: response.driver.assigned_vehicle_id?._id,
+          monthlySalary: response.driver.monthly_salary,
+          assignedVehicleType: response.driver.assigned_vehicle_type,
+          totalRides: response.driver.total_rides || 0,
+          monthlyPresents: response.driver.monthly_presents || 0,
+        };
+
+        setDrivers((prev) =>
+          prev.map((driver) =>
+            driver.id === updatedDriver.id ? transformedDriver : driver
+          )
+        );
+        setSelectedDriver(transformedDriver);
+        showToast.success(
+          `Driver "${updatedDriver.name}" has been updated successfully!`
+        );
+      }
+    } catch (error) {
+      console.error("Error updating driver:", error);
+      showToast.error("Failed to update driver");
+    }
   };
 
-  const handleDeleteDriver = (driverId) => {
-    const driverToDelete = drivers.find(driver => driver.id === driverId);
-    
-    // Show loading toast
-    const loadingToast = showToast.loading('Deleting driver...');
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      setDrivers(prev => prev.filter(driver => driver.id !== driverId));
-      setViewMode('list');
-      setSelectedDriver(null);
-      
-      // Dismiss loading toast and show success
-      showToast.dismiss(loadingToast);
-      showToast.success(`Driver "${driverToDelete?.name || 'Unknown'}" has been deleted successfully!`);
-      
-      console.log('Driver deleted:', driverId);
-    }, 1000);
+  const handleDeleteDriver = async (driverId) => {
+    const driverToDelete = drivers.find((driver) => driver.id === driverId);
+
+    const loadingToast = showToast.loading("Deleting driver...");
+
+    try {
+      const response = await driverService.deleteDriver(driverId);
+
+      if (response.success) {
+        setDrivers((prev) => prev.filter((driver) => driver.id !== driverId));
+        setViewMode("list");
+        setSelectedDriver(null);
+        showToast.success(
+          `Driver "${driverToDelete?.name}" has been deleted successfully!`
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting driver:", error);
+      showToast.error("Failed to delete driver");
+    }
+  };
+
+  const handleAddDriver = async (newDriver) => {
+    try {
+      const driverData = {
+        name: newDriver.name,
+        contact_number: newDriver.contact,
+        license_number: newDriver.licenseNumber,
+        availability_status: "available",
+        monthly_salary: parseFloat(newDriver.monthlySalary) || 0,
+      };
+
+      // Add vehicle info only if a vehicle is assigned
+      if (newDriver.assignedVehicleId) {
+        driverData.assigned_vehicle_id = newDriver.assignedVehicleId;
+        driverData.assigned_vehicle_type =
+          newDriver.vehicleCategory?.toLowerCase() || null;
+      }
+
+      const response = await driverService.createDriver(driverData);
+
+      if (response.success) {
+        const transformedDriver = {
+          id: response.driver._id,
+          name: response.driver.name,
+          licenseNumber: response.driver.license_number,
+          contact: response.driver.contact_number,
+          assignedVehicle: response.driver.assigned_vehicle_id
+            ? `${response.driver.assigned_vehicle_id.model} - ${response.driver.assigned_vehicle_id.registration_number}`
+            : "Not Assigned",
+          availability: "Available",
+          joinDate: new Date(response.driver.createdAt).toLocaleDateString(
+            "en-GB"
+          ),
+          rating: 4.5,
+          status: response.driver.availability_status,
+          vehicleId: response.driver.assigned_vehicle_id?._id,
+          monthlySalary: response.driver.monthly_salary,
+          assignedVehicleType: response.driver.assigned_vehicle_type,
+          totalRides: response.driver.total_rides || 0,
+          monthlyPresents: response.driver.monthly_presents || 0,
+        };
+
+        setDrivers((prev) => [...prev, transformedDriver]);
+        showToast.success(
+          `Driver "${newDriver.name}" has been added successfully!`
+        );
+        setShowAddDriverModal(false);
+      }
+    } catch (error) {
+      console.error("Error adding driver:", error);
+      showToast.error("Failed to add driver");
+    }
   };
 
   // Calculate pagination
@@ -266,11 +284,11 @@ export default function DriversPage() {
   const currentDrivers = filteredDrivers.slice(startIndex, endIndex);
 
   const handlePrevious = () => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
   const handleNext = () => {
-    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
   const getAvailabilityColor = (availability) => {
@@ -286,9 +304,11 @@ export default function DriversPage() {
 
   if (loading || !mounted) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#111827] flex items-center justify-center">
-        <Spinner size="lg" />
-      </div>
+      <MainLayout>
+        <div className="min-h-screen bg-gray-50 dark:bg-[#111827] flex items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+      </MainLayout>
     );
   }
 
@@ -297,15 +317,15 @@ export default function DriversPage() {
   }
 
   // Render Driver Profile if in profile view mode
-  if (viewMode === 'profile' && selectedDriver) {
+  if (viewMode === "profile" && selectedDriver) {
     return (
       <MainLayout>
         <DriverProfile
           driver={selectedDriver}
           onBack={handleBackToList}
-          onEdit={handleEditDriver}
+          onEdit={handleSaveDriver}
           onDelete={handleDeleteDriver}
-          onSave={handleEditDriver}
+          onSave={handleSaveDriver}
           initialEditMode={isEditMode}
         />
       </MainLayout>
@@ -318,8 +338,12 @@ export default function DriversPage() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">Driver Management</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Manage and monitor your drivers</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
+              Driver Management
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              Manage and monitor your drivers
+            </p>
           </div>
           <Button
             onClick={() => setShowAddDriverModal(true)}
@@ -354,7 +378,7 @@ export default function DriversPage() {
                 <Filter className="w-4 h-4" />
                 <span>Filter</span>
               </Button>
-              
+
               {showFilterDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10">
                   <div className="p-2">
@@ -364,7 +388,9 @@ export default function DriversPage() {
                         setShowFilterDropdown(false);
                       }}
                       className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                        statusFilter === "" ? "bg-secondary text-white" : "text-gray-700 dark:text-gray-300"
+                        statusFilter === ""
+                          ? "bg-secondary text-white"
+                          : "text-gray-700 dark:text-gray-300"
                       }`}
                     >
                       All Status
@@ -375,7 +401,9 @@ export default function DriversPage() {
                         setShowFilterDropdown(false);
                       }}
                       className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                        statusFilter === "Available" ? "bg-secondary text-white" : "text-gray-700 dark:text-gray-300"
+                        statusFilter === "Available"
+                          ? "bg-secondary text-white"
+                          : "text-gray-700 dark:text-gray-300"
                       }`}
                     >
                       Available
@@ -386,7 +414,9 @@ export default function DriversPage() {
                         setShowFilterDropdown(false);
                       }}
                       className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                        statusFilter === "Not Available" ? "bg-secondary text-white" : "text-gray-700 dark:text-gray-300"
+                        statusFilter === "Not Available"
+                          ? "bg-secondary text-white"
+                          : "text-gray-700 dark:text-gray-300"
                       }`}
                     >
                       Not Available
@@ -405,18 +435,30 @@ export default function DriversPage() {
             <table className="w-full">
               <thead className="bg-secondary">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Name</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">License Number</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Contact</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Assigned Vehicle</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Availability</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">Actions</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                    Name
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                    License Number
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                    Contact
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                    Assigned Vehicle
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                    Availability
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-white">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {currentDrivers.map((driver) => (
-                  <tr 
-                    key={driver.id} 
+                  <tr
+                    key={driver.id}
                     className="p-4 md:p-6 bg-dark:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 hover:bg-gray-200 border-b border-table last:border-b-0"
                   >
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
@@ -432,8 +474,18 @@ export default function DriversPage() {
                       {driver.assignedVehicle}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAvailabilityColor(driver.availability)}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${driver.availability === 'Available' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getAvailabilityColor(
+                          driver.availability
+                        )}`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                            driver.availability === "Available"
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                          }`}
+                        ></span>
                         {driver.availability}
                       </span>
                     </td>
@@ -474,40 +526,62 @@ export default function DriversPage() {
               <div key={driver.id} className="p-4 space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-medium text-gray-900 dark:text-gray-100">{driver.name}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{driver.licenseNumber}</p>
+                    <h3 className="font-medium text-gray-900 dark:text-gray-100">
+                      {driver.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {driver.licenseNumber}
+                    </p>
                   </div>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getAvailabilityColor(driver.availability)}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${driver.availability === 'Available' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getAvailabilityColor(
+                      driver.availability
+                    )}`}
+                  >
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                        driver.availability === "Available"
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
+                    ></span>
                     {driver.availability}
                   </span>
                 </div>
-                
+
                 <div className="grid grid-cols-1 gap-2 text-sm">
                   <div>
-                    <span className="text-gray-500 dark:text-gray-400">Contact: </span>
-                    <span className="text-gray-900 dark:text-gray-100">{driver.contact}</span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      Contact:{" "}
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      {driver.contact}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-gray-500 dark:text-gray-400">Vehicle: </span>
-                    <span className="text-gray-900 dark:text-gray-100">{driver.assignedVehicle}</span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      Vehicle:{" "}
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      {driver.assignedVehicle}
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex justify-end space-x-1 pt-2">
-                  <button 
+                  <button
                     onClick={() => handleViewDriver(driver)}
                     className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleEditDriverProfile(driver)}
                     className="p-2 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition-colors"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDeleteDriver(driver.id)}
                     className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                   >
@@ -522,9 +596,11 @@ export default function DriversPage() {
           <div className="bg-secondary px-4 md:px-6 py-4 border-t border-gray-200 dark:border-gray-600">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <div className="text-sm text-white">
-                Showing {startIndex + 1} to {Math.min(endIndex, filteredDrivers.length)} of {filteredDrivers.length} entries
+                Showing {startIndex + 1} to{" "}
+                {Math.min(endIndex, filteredDrivers.length)} of{" "}
+                {filteredDrivers.length} entries
               </div>
-              
+
               <div className="flex items-center justify-center sm:justify-end space-x-2">
                 <Button
                   onClick={handlePrevious}
@@ -534,11 +610,11 @@ export default function DriversPage() {
                   <ChevronLeft className="w-4 h-4" />
                   <span className="hidden sm:inline">Previous</span>
                 </Button>
-                
+
                 <span className="text-sm text-white px-3 py-2">
                   {currentPage} of {totalPages}
                 </span>
-                
+
                 <Button
                   onClick={handleNext}
                   disabled={currentPage === totalPages}
