@@ -80,10 +80,16 @@ class VehicleController {
         });
       }
 
+      // Populate driver details before sending response
+      const populatedVehicle = await Vehicle.findById(vehicle._id).populate(
+        "assigned_driver_id",
+        "name contact_number license_number"
+      );
+
       res.status(201).json({
         success: true,
         message: "Vehicle created successfully",
-        vehicle,
+        vehicle: populatedVehicle,
       });
     } catch (error) {
       console.error("Error creating vehicle:", error);

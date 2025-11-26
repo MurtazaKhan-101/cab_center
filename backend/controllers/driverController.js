@@ -81,10 +81,16 @@ class DriverController {
         });
       }
 
+      // Populate vehicle details before sending response
+      const populatedDriver = await Driver.findById(driver._id).populate(
+        "assigned_vehicle_id",
+        "registration_number model vehicle_type"
+      );
+
       res.status(201).json({
         success: true,
         message: "Driver created successfully",
-        driver,
+        driver: populatedDriver,
       });
     } catch (error) {
       console.error("Error creating driver:", error);

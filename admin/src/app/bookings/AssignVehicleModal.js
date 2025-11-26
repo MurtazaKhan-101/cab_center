@@ -1,18 +1,33 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "../components/ui";
-import { X, Car, User, MapPin, Phone, Calendar, Clock, Star } from 'lucide-react';
-import { showToast } from '../lib/toast';
+import { Button, Spinner } from "../components/ui";
+import {
+  X,
+  Car,
+  User,
+  MapPin,
+  Phone,
+  Calendar,
+  Clock,
+  Star,
+} from "lucide-react";
+import { showToast } from "../lib/toast";
+import * as driverService from "../lib/driver";
 
-export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign }) {
-  const [availableVehicles, setAvailableVehicles] = useState([]);
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+export default function AssignVehicleModal({
+  isOpen,
+  onClose,
+  booking,
+  onAssign,
+}) {
+  const [availableDrivers, setAvailableDrivers] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Mock data for available vehicles with drivers based on category
   const mockVehicleData = {
-    "SUV": [
+    SUV: [
       {
         id: 1,
         registrationNumber: "KSA 2370",
@@ -26,7 +41,7 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
         lastLocation: "King Fahd Road",
         estimatedArrival: "8 minutes",
         totalTrips: 342,
-        status: "Available"
+        status: "Available",
       },
       {
         id: 2,
@@ -41,10 +56,10 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
         lastLocation: "Olaya District",
         estimatedArrival: "12 minutes",
         totalTrips: 198,
-        status: "Available"
-      }
+        status: "Available",
+      },
     ],
-    "Sedan": [
+    Sedan: [
       {
         id: 3,
         registrationNumber: "KSA 2371",
@@ -58,7 +73,7 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
         lastLocation: "Business District",
         estimatedArrival: "5 minutes",
         totalTrips: 567,
-        status: "Available"
+        status: "Available",
       },
       {
         id: 4,
@@ -73,8 +88,8 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
         lastLocation: "Downtown",
         estimatedArrival: "15 minutes",
         totalTrips: 289,
-        status: "Available"
-      }
+        status: "Available",
+      },
     ],
     "Mini Van": [
       {
@@ -90,7 +105,7 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
         lastLocation: "Airport Road",
         estimatedArrival: "18 minutes",
         totalTrips: 756,
-        status: "Available"
+        status: "Available",
       },
       {
         id: 6,
@@ -105,7 +120,7 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
         lastLocation: "King Khalid Airport",
         estimatedArrival: "25 minutes",
         totalTrips: 134,
-        status: "Available"
+        status: "Available",
       },
       {
         id: 7,
@@ -120,38 +135,62 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
         lastLocation: "Diplomatic Quarter",
         estimatedArrival: "10 minutes",
         totalTrips: 423,
-        status: "Available"
-      }
-    ]
+        status: "Available",
+      },
+    ],
   };
 
   useEffect(() => {
-    if (isOpen && booking) {
+    const fetchAvailableDrivers = async () => {
+      if (!isOpen || !booking) return;
+
       setLoading(true);
-      // Simulate API call to fetch available vehicles for the requested category
-      setTimeout(() => {
-        const vehicles = mockVehicleData[booking.vehicle] || [];
-        // Sort by estimated arrival time (ascending)
-        const sortedVehicles = vehicles.sort((a, b) => 
-          parseInt(a.estimatedArrival) - parseInt(b.estimatedArrival)
-        );
-        setAvailableVehicles(sortedVehicles);
+      try {
+        const response = await driverService.getAvailableDrivers();
+        if (response.success) {
+          // Filter drivers with vehicles matching the requested category
+          const vehicleType = booking.vehicle.toLowerCase();
+          const matchingDrivers = response.drivers.filter(
+            (driver) =>
+              driver.assigned_vehicle_id &&
+              driver.assigned_vehicle_id.vehicle_type.toLowerCase() ===
+                vehicleType &&
+              driver.availability_status === "available"
+          );
+
+          setAvailableDrivers(matchingDrivers);
+        }
+      } catch (error) {
+        console.error("Error fetching drivers:", error);
+        showToast.error("Failed to load available drivers");
+      } finally {
         setLoading(false);
-      }, 1000);
-    }
+      }
+    };
+
+    fetchAvailableDrivers();
   }, [isOpen, booking]);
 
-  const handleSelectVehicle = (vehicle) => {
-    setSelectedVehicle(vehicle);
+  const handleSelectDriver = (driver) => {
+    setSelectedDriver(driver);
   };
 
   const handleAssign = async () => {
-    if (!selectedVehicle) {
-      showToast.error("Please select a vehicle and driver");
+    if (!selectedDriver) {
+      showToast.error("Please select a driver");
       return;
     }
 
-    await onAssign(booking.id, selectedVehicle);
+    await onAssign(booking.id, {
+      driverId: selectedDriver._id,
+      vehicleId: selectedDriver.assigned_vehicle_id._id,
+      driverName: selectedDriver.name,
+      driverPhone: selectedDriver.contact_number,
+      registrationNumber:
+        selectedDriver.assigned_vehicle_id.registration_number,
+      model: selectedDriver.assigned_vehicle_id.model,
+      vehicleType: selectedDriver.assigned_vehicle_id.vehicle_type,
+    });
   };
 
   const getRatingStars = (rating) => {
@@ -160,8 +199,8 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
         key={index}
         className={`w-4 h-4 ${
           index < Math.floor(rating)
-            ? 'text-yellow-400 fill-current'
-            : 'text-gray-300 dark:text-gray-600'
+            ? "text-yellow-400 fill-current"
+            : "text-gray-300 dark:text-gray-600"
         }`}
       />
     ));
@@ -196,7 +235,9 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center space-x-2">
               <User className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">Customer: {booking.name}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                Customer: {booking.name}
+              </span>
             </div>
             <div className="flex items-center space-x-2">
               <MapPin className="w-4 h-4 text-gray-500" />
@@ -213,38 +254,41 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
           </div>
         </div>
 
-        {/* Available Vehicles */}
+        {/* Available Drivers */}
         <div className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            Available {booking.vehicle} Vehicles ({availableVehicles.length})
+            Available {booking.vehicle} Drivers ({availableDrivers.length})
           </h3>
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
-              <span className="ml-3 text-gray-600 dark:text-gray-400">Loading available vehicles...</span>
+              <Spinner size="md" />
+              <span className="ml-3 text-gray-600 dark:text-gray-400">
+                Loading available drivers...
+              </span>
             </div>
-          ) : availableVehicles.length === 0 ? (
+          ) : availableDrivers.length === 0 ? (
             <div className="text-center py-12">
               <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                No Available Vehicles
+                No Available Drivers
               </h4>
               <p className="text-gray-600 dark:text-gray-400">
-                No {booking.vehicle} vehicles are currently available for assignment.
+                No drivers with {booking.vehicle} vehicles are currently
+                available for assignment.
               </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {availableVehicles.map((vehicle) => (
+              {availableDrivers.map((driver) => (
                 <div
-                  key={vehicle.id}
+                  key={driver._id}
                   className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
-                    selectedVehicle?.id === vehicle.id
-                      ? 'border-secondary bg-secondary/5'
-                      : 'border-gray-200 dark:border-gray-600 hover:border-secondary/50'
+                    selectedDriver?._id === driver._id
+                      ? "border-secondary bg-secondary/5"
+                      : "border-gray-200 dark:border-gray-600 hover:border-secondary/50"
                   }`}
-                  onClick={() => handleSelectVehicle(vehicle)}
+                  onClick={() => handleSelectDriver(driver)}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -253,18 +297,30 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
                         <div>
                           <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-2">
                             <Car className="w-4 h-4" />
-                            <span>{vehicle.registrationNumber} - {vehicle.model}</span>
+                            <span>
+                              {driver.assigned_vehicle_id.registration_number} -{" "}
+                              {driver.assigned_vehicle_id.model}
+                            </span>
                           </h4>
                           <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                            <p>Year: {vehicle.year}</p>
-                            <p>Category: {vehicle.category}</p>
-                            <p className="flex items-center space-x-1">
-                              <MapPin className="w-3 h-3" />
-                              <span>Last Location: {vehicle.lastLocation}</span>
+                            <p>
+                              Year: {driver.assigned_vehicle_id.year || "N/A"}
                             </p>
-                            <p className="flex items-center space-x-1 text-green-600 dark:text-green-400 font-medium">
-                              <Clock className="w-3 h-3" />
-                              <span>ETA: {vehicle.estimatedArrival}</span>
+                            <p>
+                              Category:{" "}
+                              {driver.assigned_vehicle_id.vehicle_type
+                                .charAt(0)
+                                .toUpperCase() +
+                                driver.assigned_vehicle_id.vehicle_type.slice(
+                                  1
+                                )}
+                            </p>
+                            <p>
+                              Capacity: {driver.assigned_vehicle_id.capacity}{" "}
+                              passengers
+                            </p>
+                            <p className="text-green-600 dark:text-green-400 font-medium">
+                              Status: Available
                             </p>
                           </div>
                         </div>
@@ -273,21 +329,17 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
                         <div>
                           <h5 className="font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center space-x-2">
                             <User className="w-4 h-4" />
-                            <span>{vehicle.driverName}</span>
+                            <span>{driver.name}</span>
                           </h5>
                           <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                             <div className="flex items-center space-x-1">
                               <Phone className="w-3 h-3" />
-                              <span>{vehicle.driverPhone}</span>
+                              <span>{driver.contact_number}</span>
                             </div>
-                            <div className="flex items-center space-x-2">
-                              <div className="flex items-center space-x-1">
-                                {getRatingStars(vehicle.driverRating)}
-                              </div>
-                              <span className="text-xs">({vehicle.driverRating}/5)</span>
-                            </div>
-                            <p>Experience: {vehicle.driverExperience}</p>
-                            <p>Total Trips: {vehicle.totalTrips}</p>
+                            <p>License: {driver.license_number}</p>
+                            {driver.experience_years && (
+                              <p>Experience: {driver.experience_years} years</p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -295,12 +347,14 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
 
                     {/* Selection Indicator */}
                     <div className="ml-4">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        selectedVehicle?.id === vehicle.id
-                          ? 'border-secondary bg-secondary'
-                          : 'border-gray-300 dark:border-gray-600'
-                      }`}>
-                        {selectedVehicle?.id === vehicle.id && (
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          selectedDriver?._id === driver._id
+                            ? "border-secondary bg-secondary"
+                            : "border-gray-300 dark:border-gray-600"
+                        }`}
+                      >
+                        {selectedDriver?._id === driver._id && (
                           <div className="w-2 h-2 rounded-full bg-white"></div>
                         )}
                       </div>
@@ -314,19 +368,15 @@ export default function AssignVehicleModal({ isOpen, onClose, booking, onAssign 
 
         {/* Footer Actions */}
         <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
-          <Button
-            onClick={onClose}
-            variant="outline"
-            className="px-6 py-2"
-          >
+          <Button onClick={onClose} variant="outline" className="px-6 py-2">
             Cancel
           </Button>
           <Button
             onClick={handleAssign}
-            disabled={!selectedVehicle || loading}
+            disabled={!selectedDriver || loading}
             className="bg-buttons-gradient hover:bg-buttons-gradient-hover text-white px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Assign Vehicle & Driver
+            Assign Driver & Vehicle
           </Button>
         </div>
       </div>

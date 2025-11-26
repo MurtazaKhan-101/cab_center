@@ -1,42 +1,117 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../components/ui";
-import { X } from 'lucide-react';
-import { showToast } from '../lib/toast';
+import { X } from "lucide-react";
+import { showToast } from "../lib/toast";
+import * as vehicleService from "../lib/vehicle";
 
 export default function AddDriverModal({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
     name: "",
     contact: "",
     licenseNumber: "",
-    assignedVehicle: "",
-    availability: "Available"
+    monthlySalary: "",
+    vehicleCategory: "",
+    assignedVehicleId: "",
+    availability: "Available",
   });
 
+  const [vehicleTypes, setVehicleTypes] = useState([]);
+  const [availableVehicles, setAvailableVehicles] = useState([]);
+  const [filteredVehicles, setFilteredVehicles] = useState([]);
+  const [loadingVehicles, setLoadingVehicles] = useState(false);
+
+  // Fetch vehicle types when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchVehicleTypesAndVehicles();
+    }
+  }, [isOpen]);
+
+  // Filter vehicles when category changes
+  useEffect(() => {
+    if (formData.vehicleCategory) {
+      const filtered = availableVehicles.filter(
+        (v) => v.vehicle_type === formData.vehicleCategory.toLowerCase()
+      );
+      setFilteredVehicles(filtered);
+    } else {
+      setFilteredVehicles([]);
+    }
+  }, [formData.vehicleCategory, availableVehicles]);
+
+  const fetchVehicleTypesAndVehicles = async () => {
+    setLoadingVehicles(true);
+    try {
+      const [typesRes, vehiclesRes] = await Promise.all([
+        vehicleService.getVehicleTypes(),
+        vehicleService.getAllVehicles(),
+      ]);
+
+      if (typesRes.success) {
+        // Extract vehicle type names from the response
+        // If vehicleTypes is an array of objects with 'type' property, extract them
+        // If it's already an array of strings, use as is
+        const types = typesRes.vehicleTypes.map((item) =>
+          typeof item === "string"
+            ? item
+            : item.type || item.vehicle_type || item._id
+        );
+        setVehicleTypes(types);
+      }
+
+      if (vehiclesRes.success) {
+        // Filter for vehicles that are available and not assigned to any driver
+        const unassignedVehicles = vehiclesRes.vehicles.filter(
+          (v) => v.availability_status === "available" && !v.assigned_driver_id
+        );
+        setAvailableVehicles(unassignedVehicles);
+      }
+    } catch (error) {
+      console.error("Error fetching vehicles:", error);
+      showToast.error("Failed to load vehicles");
+    } finally {
+      setLoadingVehicles(false);
+    }
+  };
+
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [field]: value,
+      };
+
+      // Reset vehicle selection when category changes
+      if (field === "vehicleCategory") {
+        updated.assignedVehicleId = "";
+      }
+
+      return updated;
+    });
   };
 
   const handleSave = async () => {
     // Validate form data before saving
-    if (!formData.name.trim() || !formData.contact.trim() || !formData.licenseNumber.trim()) {
+    if (
+      !formData.name.trim() ||
+      !formData.contact.trim() ||
+      !formData.licenseNumber.trim() ||
+      !formData.monthlySalary
+    ) {
       showToast.error("Please fill in all required fields");
       return;
     }
 
     // Show loading toast
     const toastId = showToast.loading("Adding driver...");
-    
+
     try {
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       onSave(formData);
-      showToast.success("Driver added successfully!", toastId);
       handleDiscard();
     } catch (error) {
       showToast.error("Failed to add driver. Please try again.", toastId);
@@ -48,9 +123,12 @@ export default function AddDriverModal({ isOpen, onClose, onSave }) {
       name: "",
       contact: "",
       licenseNumber: "",
-      assignedVehicle: "",
-      availability: "Available"
+      monthlySalary: "",
+      vehicleCategory: "",
+      assignedVehicleId: "",
+      availability: "Available",
     });
+    setFilteredVehicles([]);
     onClose();
   };
 
@@ -61,7 +139,9 @@ export default function AddDriverModal({ isOpen, onClose, onSave }) {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
         <div className="flex bg-secondary items-center justify-between p-6 border-b border-gray-200 dark:border-gray-600">
-          <h2 className="text-xl font-bold text-white dark:text-gray-100">Add Driver</h2>
+          <h2 className="text-xl font-bold text-white dark:text-gray-100">
+            Add Driver
+          </h2>
           <button
             onClick={handleDiscard}
             className="p-2 text-white hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -74,8 +154,10 @@ export default function AddDriverModal({ isOpen, onClose, onSave }) {
         <div className="p-6">
           {/* Personal Information Section */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Personal Information</h3>
-            
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              Personal Information
+            </h3>
+
             {/* Name and Contact Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
@@ -86,7 +168,7 @@ export default function AddDriverModal({ isOpen, onClose, onSave }) {
                   type="text"
                   placeholder="Enter name"
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
                 />
               </div>
@@ -98,50 +180,120 @@ export default function AddDriverModal({ isOpen, onClose, onSave }) {
                   type="text"
                   placeholder="Enter contact"
                   value={formData.contact}
-                  onChange={(e) => handleInputChange('contact', e.target.value)}
+                  onChange={(e) => handleInputChange("contact", e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
                 />
               </div>
             </div>
 
-            {/* License Number and Assigned Vehicle Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
+            {/* License Number */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                License Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Enter license number"
+                value={formData.licenseNumber}
+                onChange={(e) =>
+                  handleInputChange("licenseNumber", e.target.value)
+                }
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+              />
+            </div>
+
+            {/* Monthly Salary */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Monthly Salary (SAR) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                placeholder="Enter monthly salary"
+                value={formData.monthlySalary}
+                onChange={(e) =>
+                  handleInputChange("monthlySalary", e.target.value)
+                }
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+              />
+            </div>
+
+            {/* Vehicle Assignment Section */}
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                Vehicle Assignment (Optional)
+              </h4>
+
+              {/* Vehicle Category Selection */}
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  License Number <span className="text-red-500">*</span>
+                  Vehicle Category
                 </label>
-                <input
-                  type="text"
-                  placeholder="Enter license number"
-                  value={formData.licenseNumber}
-                  onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Assigned Vehicle</label>
                 <select
-                  value={formData.assignedVehicle}
-                  onChange={(e) => handleInputChange('assignedVehicle', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                  value={formData.vehicleCategory}
+                  onChange={(e) =>
+                    handleInputChange("vehicleCategory", e.target.value)
+                  }
+                  disabled={loadingVehicles}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="">Assign a vehicle</option>
-                  <option value="Hyundai Sitaria">Hyundai Sitaria</option>
-                  <option value="Toyota Camry">Toyota Camry</option>
-                  <option value="Honda Accord">Honda Accord</option>
-                  <option value="Nissan Altima">Nissan Altima</option>
-                  <option value="BMW 3 Series">BMW 3 Series</option>
-                  <option value="Mercedes C-Class">Mercedes C-Class</option>
+                  <option value="">Select vehicle category</option>
+                  {vehicleTypes.map((type) => {
+                    const typeStr = String(type);
+                    return (
+                      <option key={typeStr} value={typeStr}>
+                        {typeStr.charAt(0).toUpperCase() + typeStr.slice(1)}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
+
+              {/* Vehicle Selection (Only shown when category is selected) */}
+              {formData.vehicleCategory && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Select Vehicle
+                  </label>
+                  <select
+                    value={formData.assignedVehicleId}
+                    onChange={(e) =>
+                      handleInputChange("assignedVehicleId", e.target.value)
+                    }
+                    disabled={loadingVehicles || filteredVehicles.length === 0}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">
+                      {filteredVehicles.length === 0
+                        ? `No available ${formData.vehicleCategory} vehicles`
+                        : "Select a vehicle"}
+                    </option>
+                    {filteredVehicles.map((vehicle) => (
+                      <option key={vehicle._id} value={vehicle._id}>
+                        {vehicle.model} - {vehicle.registration_number}
+                      </option>
+                    ))}
+                  </select>
+                  {filteredVehicles.length === 0 &&
+                    formData.vehicleCategory && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        No available vehicles in this category
+                      </p>
+                    )}
+                </div>
+              )}
             </div>
 
             {/* Availability */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Availability</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Availability
+              </label>
               <select
                 value={formData.availability}
-                onChange={(e) => handleInputChange('availability', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("availability", e.target.value)
+                }
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
               >
                 <option value="Available">Available</option>

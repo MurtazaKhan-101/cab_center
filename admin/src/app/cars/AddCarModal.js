@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "../components/ui";
-import { X, Car, CreditCard, Calendar, Users, Settings } from 'lucide-react';
-import { showToast } from '../lib/toast';
+import { X, Car, CreditCard, Calendar, Users, Settings } from "lucide-react";
+import { showToast } from "../lib/toast";
 
 export default function AddCarModal({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -11,30 +11,35 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
     registrationNumber: "",
     model: "",
     year: "",
-    availability: "Available"
+    availability: "Available",
   });
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSave = async () => {
     // Validate form data before saving
-    if (!formData.category.trim() || !formData.registrationNumber.trim() || !formData.model.trim() || !formData.year) {
+    if (
+      !formData.category.trim() ||
+      !formData.registrationNumber.trim() ||
+      !formData.model.trim() ||
+      !formData.year
+    ) {
       showToast.error("Please fill in all required fields");
       return;
     }
 
     // Show loading toast
     const toastId = showToast.loading("Adding vehicle...");
-    
+
     try {
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       onSave(formData);
       showToast.success("Vehicle added successfully!", toastId);
       handleDiscard();
@@ -49,7 +54,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
       registrationNumber: "",
       model: "",
       year: "",
-      availability: "Available"
+      availability: "Available",
     });
     onClose();
   };
@@ -84,7 +89,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
               </label>
               <select
                 value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
+                onChange={(e) => handleInputChange("category", e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
               >
                 <option value="">Select category</option>
@@ -103,7 +108,9 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                 type="text"
                 placeholder="e.g., KSA 2370"
                 value={formData.registrationNumber}
-                onChange={(e) => handleInputChange('registrationNumber', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("registrationNumber", e.target.value)
+                }
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
               />
             </div>
@@ -120,7 +127,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                 type="text"
                 placeholder="e.g., Camry, Prado, Hiace"
                 value={formData.model}
-                onChange={(e) => handleInputChange('model', e.target.value)}
+                onChange={(e) => handleInputChange("model", e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
               />
             </div>
@@ -132,12 +139,14 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
               </label>
               <select
                 value={formData.year}
-                onChange={(e) => handleInputChange('year', e.target.value)}
+                onChange={(e) => handleInputChange("year", e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
               >
                 <option value="">Select year</option>
-                {Array.from({ length: 20 }, (_, i) => 2025 - i).map(year => (
-                  <option key={year} value={year}>{year}</option>
+                {Array.from({ length: 20 }, (_, i) => 2025 - i).map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
                 ))}
               </select>
             </div>
@@ -151,7 +160,8 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                 <span>Assigned To</span>
               </label>
               <div className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-600 rounded-lg text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600">
-                {formData.assignedTo || "Not assigned - Manage from Driver Management"}
+                {formData.assignedTo ||
+                  "Not assigned - Manage from Driver Management"}
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Vehicle assignments are managed from Driver Management section
@@ -165,7 +175,9 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
               </label>
               <select
                 value={formData.availability}
-                onChange={(e) => handleInputChange('availability', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("availability", e.target.value)
+                }
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
               >
                 <option value="Available">Available</option>
