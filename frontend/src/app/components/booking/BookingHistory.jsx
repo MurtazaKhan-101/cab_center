@@ -4,10 +4,15 @@ import { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin } from "lucide-react";
 import { getMyBookings } from "../../lib/booking";
 import { Alert, Spinner } from "../ui";
+import PaginationWithI18n from "../ui/PaginationWithI18n";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "../../../lib/i18n";
 
 export const BookingHistory = () => {
   const { loading: authLoading, isAuthenticated } = useAuth();
+  const { t, isRTL } = useTranslation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const entriesPerPage = 6; // Show 6 items per page for better mobile experience
   const [bookingHistory, setBookingHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,14 +41,28 @@ export const BookingHistory = () => {
         }
       } catch (err) {
         console.error("Error fetching bookings:", err);
-        setError("Failed to load booking history. Please try again.");
+        setError(t('messages.fetch_error_history'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchBookings();
-  }, [authLoading, isAuthenticated]);
+  }, [authLoading, isAuthenticated, t]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(bookingHistory.length / entriesPerPage);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = startIndex + entriesPerPage;
+  const currentBookings = bookingHistory.slice(startIndex, endIndex);
+
+  const handlePrevPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -73,12 +92,12 @@ export const BookingHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 sm:p-4">
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 ${isRTL() ? 'rtl' : 'ltr'}`}>
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
-            My History
+            {t('booking_history.title')}
           </h1>
         </div>
 
@@ -95,11 +114,11 @@ export const BookingHistory = () => {
 
         {/* History Cards Container */}
         <div className="space-y-3">
-          {bookingHistory.map((booking, index) => (
+          {currentBookings.map((booking, index) => (
             <div
               key={booking._id}
               className={`${
-                index % 2 === 0 ? "bg-[#5C88D7]" : "bg-[#E5EAFF]"
+                (startIndex + index) % 2 === 0 ? "bg-[#5C88D7]" : "bg-[#E5EAFF]"
               } rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-[1.01]`}
             >
               {/* Main Content */}
@@ -110,13 +129,13 @@ export const BookingHistory = () => {
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-2.5 h-2.5 ${
-                        index % 2 === 0 ? "bg-white" : "bg-[#5C88D7]"
+                        (startIndex + index) % 2 === 0 ? "bg-white" : "bg-[#5C88D7]"
                       } rounded-full shadow-sm`}
                     ></div>
                     <div className="flex-1">
                       <p
                         className={`${
-                          index % 2 === 0 ? "text-white" : "text-gray-800"
+                          (startIndex + index) % 2 === 0 ? "text-white" : "text-gray-800"
                         } text-sm sm:text-base font-medium leading-relaxed`}
                       >
                         {booking.pickup}
@@ -128,13 +147,13 @@ export const BookingHistory = () => {
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-2.5 h-2.5 ${
-                        index % 2 === 0 ? "bg-green-300" : "bg-green-500"
+                        (startIndex + index) % 2 === 0 ? "bg-green-300" : "bg-green-500"
                       } rounded-full shadow-sm`}
                     ></div>
                     <div className="flex-1">
                       <p
                         className={`${
-                          index % 2 === 0 ? "text-white" : "text-gray-800"
+                          (startIndex + index) % 2 === 0 ? "text-white" : "text-gray-800"
                         } text-sm sm:text-base font-medium leading-relaxed`}
                       >
                         {booking.drop}
@@ -144,17 +163,17 @@ export const BookingHistory = () => {
                 </div>
 
                 {/* Right Section - Date, Time, Amount */}
-                <div className="sm:text-right space-y-1.5 sm:min-w-[130px]">
+                <div className={`sm:text-${isRTL() ? 'left' : 'right'} space-y-1.5 sm:min-w-[130px]`}>
                   {/* Date */}
-                  <div className="flex sm:justify-end items-center gap-2">
+                  <div className={`flex ${isRTL() ? 'sm:justify-start' : 'sm:justify-end'} items-center gap-2`}>
                     <Calendar
                       className={`w-4 h-4 ${
-                        index % 2 === 0 ? "text-white/80" : "text-gray-600"
+                        (startIndex + index) % 2 === 0 ? "text-white/80" : "text-gray-600"
                       }`}
                     />
                     <p
                       className={`${
-                        index % 2 === 0 ? "text-white" : "text-gray-800"
+                        (startIndex + index) % 2 === 0 ? "text-white" : "text-gray-800"
                       } text-sm font-medium`}
                     >
                       {formatDate(booking.date)}
@@ -162,15 +181,15 @@ export const BookingHistory = () => {
                   </div>
 
                   {/* Time */}
-                  <div className="flex sm:justify-end items-center gap-2">
+                  <div className={`flex ${isRTL() ? 'sm:justify-start' : 'sm:justify-end'} items-center gap-2`}>
                     <Clock
                       className={`w-4 h-4 ${
-                        index % 2 === 0 ? "text-white/80" : "text-gray-600"
+                        (startIndex + index) % 2 === 0 ? "text-white/80" : "text-gray-600"
                       }`}
                     />
                     <p
                       className={`${
-                        index % 2 === 0 ? "text-white" : "text-gray-800"
+                        (startIndex + index) % 2 === 0 ? "text-white" : "text-gray-800"
                       } text-sm font-medium`}
                     >
                       {formatTime(booking.time)}
@@ -180,13 +199,13 @@ export const BookingHistory = () => {
                   {/* Amount */}
                   <div
                     className={`${
-                      index % 2 === 0
+                      (startIndex + index) % 2 === 0
                         ? "bg-white/20 text-white"
                         : "bg-[#5C88D7] text-white"
                     } backdrop-blur-sm rounded-lg px-3 py-1.5 sm:inline-block w-full sm:w-auto text-center`}
                   >
                     <p className="text-base sm:text-lg font-bold">
-                      SAR {booking.total_fare}
+                      {t('booking_history.sar_currency')} {booking.total_fare}
                     </p>
                   </div>
                 </div>
@@ -195,17 +214,32 @@ export const BookingHistory = () => {
           ))}
         </div>
 
+        {/* Pagination */}
+        {bookingHistory.length > 0 && (
+          <div className="mt-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              <PaginationWithI18n
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={bookingHistory.length}
+                itemsPerPage={entriesPerPage}
+                onPrevPage={handlePrevPage}
+                onNextPage={handleNextPage}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Empty State (when no bookings) */}
         {bookingHistory.length === 0 && (
           <div className="text-center py-16">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg max-w-md mx-auto">
               <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                No History Found
+                {t('booking_history.no_history_title')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                You haven&apos;t made any bookings yet. Start by booking your
-                first ride!
+                {t('booking_history.no_history_desc')}
               </p>
             </div>
           </div>

@@ -16,9 +16,12 @@ import Image from "next/image";
 import { useAuth } from "../../context/AuthContext";
 import { createBooking } from "../../lib/booking";
 import { getVehicleTypes } from "../../lib/vehicle";
+import { useTranslation } from "../../../lib/i18n";
 
 export default function BookingInterface() {
   const { user } = useAuth();
+  const { t, isRTL } = useTranslation();
+  
   const [formData, setFormData] = useState({
     from: "",
     to: "",
@@ -45,30 +48,30 @@ export default function BookingInterface() {
       const fallbackVehicles = [
         {
           id: "sedan",
-          name: "Sedan",
-          price: "SAR 50/km",
+          name: t('vehicles.sedan'),
+          price: t('booking_form.price_per_km', { price: '50' }),
           farePerKm: 50,
           image: "/images/sedan.svg",
           seats: 4,
-          capacity: "4 seats",
+          capacity: t('booking_form.vehicle_capacity', { seats: '4' }),
         },
         {
           id: "suv",
-          name: "SUV",
-          price: "SAR 80/km",
+          name: t('vehicles.suv'),
+          price: t('booking_form.price_per_km', { price: '80' }),
           farePerKm: 80,
           image: "/images/suv.svg",
           seats: 6,
-          capacity: "6 seats",
+          capacity: t('booking_form.vehicle_capacity', { seats: '6' }),
         },
         {
           id: "mini van",
-          name: "Mini Van",
-          price: "SAR 150/km",
+          name: t('vehicles.mini_van'),
+          price: t('booking_form.price_per_km', { price: '150' }),
           farePerKm: 150,
           image: "/images/hiace.svg",
           seats: 4,
-          capacity: "4 seats",
+          capacity: t('booking_form.vehicle_capacity', { seats: '4' }),
         },
       ];
 
@@ -82,13 +85,12 @@ export default function BookingInterface() {
           // Map backend vehicle data to frontend format
           const vehicleData = response.vehicleTypes.map((v) => ({
             id: v.vehicle_type,
-            name:
-              v.vehicle_type.charAt(0).toUpperCase() + v.vehicle_type.slice(1),
-            price: `SAR ${v.fare_per_km}/km`,
+            name: t(`vehicles.${v.vehicle_type}`) || v.vehicle_type.charAt(0).toUpperCase() + v.vehicle_type.slice(1),
+            price: t('booking_form.price_per_km', { price: v.fare_per_km }),
             farePerKm: v.fare_per_km,
             image: `/images/${v.vehicle_type}.svg`,
             seats: v.capacity,
-            capacity: `${v.capacity} seats`,
+            capacity: t('booking_form.vehicle_capacity', { seats: v.capacity }),
             available: v.available_count,
           }));
           setVehicles(vehicleData);
@@ -107,7 +109,7 @@ export default function BookingInterface() {
     };
 
     fetchVehicles();
-  }, []);
+  }, [t]);
 
   // Update email when user changes
   useEffect(() => {
@@ -118,7 +120,23 @@ export default function BookingInterface() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Apply character limits
+    let updatedValue = value;
+    if (name === 'passengerName' && value.length > 100) {
+      updatedValue = value.substring(0, 100);
+    }
+    if (name === 'specialRequirements' && value.length > 500) {
+      updatedValue = value.substring(0, 500);
+    }
+    if (name === 'from' && value.length > 100) {
+      updatedValue = value.substring(0, 100);
+    }
+    if (name === 'to' && value.length > 100) {
+      updatedValue = value.substring(0, 100);
+    }
+    
+    setFormData((prev) => ({ ...prev, [name]: updatedValue }));
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -148,102 +166,114 @@ export default function BookingInterface() {
 
     // Location validation
     if (!formData.from.trim()) {
-      newErrors.from = "Pickup location is required";
+      newErrors.from = t('validation.pickup_required');
     } else if (formData.from.trim().length < 3) {
-      newErrors.from = "Pickup location must be at least 3 characters";
+      newErrors.from = t('validation.pickup_min_length');
+    } else if (formData.from.trim().length > 100) {
+      newErrors.from = t('validation.pickup_max_length');
     }
 
     if (!formData.to.trim()) {
-      newErrors.to = "Destination is required";
+      newErrors.to = t('validation.destination_required');
     } else if (formData.to.trim().length < 3) {
-      newErrors.to = "Destination must be at least 3 characters";
+      newErrors.to = t('validation.destination_min_length');
+    } else if (formData.to.trim().length > 100) {
+      newErrors.to = t('validation.destination_max_length');
     }
 
     // Date validation
     if (!formData.date) {
-      newErrors.date = "Date is required";
+      newErrors.date = t('validation.date_required');
     } else {
       const selectedDate = new Date(formData.date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       if (selectedDate < today) {
-        newErrors.date = "Date cannot be in the past";
+        newErrors.date = t('validation.date_past_error');
       }
     }
 
     // Time validation
     if (!formData.time) {
-      newErrors.time = "Time is required";
+      newErrors.time = t('validation.time_required');
     } else if (formData.date) {
       const selectedDateTime = new Date(`${formData.date}T${formData.time}`);
       const now = new Date();
 
       if (selectedDateTime <= now) {
-        newErrors.time = "Time must be in the future";
+        newErrors.time = t('validation.time_future_error');
       }
     }
 
     // Passenger details validation
     if (!formData.passengerName.trim()) {
-      newErrors.passengerName = "Passenger name is required";
+      newErrors.passengerName = t('validation.passenger_name_required');
     } else if (formData.passengerName.trim().length < 2) {
-      newErrors.passengerName = "Name must be at least 2 characters";
-    } else if (!/^[a-zA-Z\s]+$/.test(formData.passengerName.trim())) {
-      newErrors.passengerName = "Name can only contain letters and spaces";
+      newErrors.passengerName = t('validation.passenger_name_min');
+    } else if (formData.passengerName.trim().length > 100) {
+      newErrors.passengerName = t('validation.passenger_name_max');
+    } else if (!/^[a-zA-Z\s\u0600-\u06FF]+$/.test(formData.passengerName.trim())) {
+      newErrors.passengerName = t('validation.passenger_name_letters');
     }
 
     // Contact number validation
     if (!formData.contactNumber.trim()) {
-      newErrors.contactNumber = "Contact number is required";
+      newErrors.contactNumber = t('validation.contact_required');
     } else if (
-      !/^(\+92|0)[0-9]{10}$/.test(formData.contactNumber.replace(/\s/g, ""))
+      !/^(\+966|05)[0-9]{8}$/.test(formData.contactNumber.replace(/\s/g, ""))
     ) {
-      newErrors.contactNumber =
-        "Please enter a valid Saudi Arabian mobile number (+966XXXXXXXXXX)";
+      newErrors.contactNumber = t('validation.contact_invalid_sa');
     }
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = t('validation.email_required');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = t('validation.email_invalid');
     }
 
     // Number of passengers validation
     if (!formData.numberOfPassengers.trim()) {
-      newErrors.numberOfPassengers = "Number of passengers is required";
+      newErrors.numberOfPassengers = t('validation.passengers_count_required');
     } else {
       const passengerCount = parseInt(formData.numberOfPassengers);
       if (isNaN(passengerCount) || passengerCount < 1) {
-        newErrors.numberOfPassengers = "Must be at least 1 passenger";
+        newErrors.numberOfPassengers = t('validation.passengers_min');
       } else if (passengerCount > 20) {
-        newErrors.numberOfPassengers = "Maximum 20 passengers allowed";
+        newErrors.numberOfPassengers = t('validation.passengers_max');
       } else if (formData.selectedVehicle) {
         const selectedVehicle = vehicles.find(
           (v) => v.id === formData.selectedVehicle
         );
         if (selectedVehicle && passengerCount > selectedVehicle.seats) {
-          newErrors.numberOfPassengers = `Selected vehicle can only accommodate ${selectedVehicle.seats} passengers`;
+          newErrors.numberOfPassengers = t('validation.vehicle_capacity_error', { 
+            seats: selectedVehicle.seats 
+          });
         }
       }
     }
 
     // Distance validation
     if (!formData.distanceKm.trim()) {
-      newErrors.distanceKm = "Estimated distance is required";
+      newErrors.distanceKm = t('validation.distance_required');
     } else {
       const distance = parseFloat(formData.distanceKm);
       if (isNaN(distance) || distance <= 0) {
-        newErrors.distanceKm = "Distance must be a positive number";
+        newErrors.distanceKm = t('validation.distance_positive');
       } else if (distance > 1000) {
-        newErrors.distanceKm = "Maximum distance is 1000 km";
+        newErrors.distanceKm = t('validation.distance_max');
       }
+    }
+
+    // Special requirements validation
+    if (formData.specialRequirements && formData.specialRequirements.length > 500) {
+      newErrors.specialRequirements = t('validation.req_max_length');
     }
 
     // Vehicle selection validation
     if (!formData.selectedVehicle) {
-      newErrors.selectedVehicle = "Please select a vehicle";
+      newErrors.selectedVehicle = t('validation.vehicle_select_error');
     }
 
     setErrors(newErrors);
@@ -256,7 +286,7 @@ export default function BookingInterface() {
     if (!validateForm()) {
       setAlert({
         type: "error",
-        message: "Please correct the errors below and try again.",
+        message: t('messages.correct_errors'),
       });
       return;
     }
@@ -284,7 +314,9 @@ export default function BookingInterface() {
       if (response.success) {
         setAlert({
           type: "success",
-          message: `Booking request submitted successfully! Estimated fare: SAR ${response.booking.total_fare}. You will receive a confirmation via email shortly.`,
+          message: t('messages.booking_success', { 
+            fare: response.booking.total_fare 
+          }),
         });
 
         // Reset form
@@ -304,15 +336,14 @@ export default function BookingInterface() {
       } else {
         setAlert({
           type: "error",
-          message:
-            response.message || "Failed to submit booking. Please try again.",
+          message: response.message || t('messages.booking_failed'),
         });
       }
     } catch (error) {
       console.error("Booking error:", error);
       setAlert({
         type: "error",
-        message: error.message || "Failed to submit booking. Please try again.",
+        message: error.message || t('messages.booking_failed'),
       });
     } finally {
       setSubmitting(false);
@@ -328,7 +359,7 @@ export default function BookingInterface() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-2 sm:p-4">
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 p-2 sm:p-4 ${isRTL() ? 'rtl' : 'ltr'}`}>
       <div className="max-w-7xl mx-auto h-screen flex flex-col">
         <div className="grid lg:grid-cols-2 gap-4 lg:gap-6 h-full">
           {/* Left Side - Map */}
@@ -360,7 +391,7 @@ export default function BookingInterface() {
           {/* Right Side - Booking Form */}
           <div className="bg-white dark:bg-gray-800 rounded-xl lg:rounded-2xl shadow-lg p-4 sm:p-6 order-1 lg:order-2 flex flex-col h-full">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
-              Book Your Ride
+              {t('booking_form.title')}
             </h2>
 
             {/* Alert */}
@@ -377,38 +408,50 @@ export default function BookingInterface() {
             <div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4">
               {/* Location Fields */}
               <div className="space-y-2 sm:space-y-3">
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-4 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg" />
-                  <Input
-                    type="text"
-                    name="from"
-                    placeholder="From:"
-                    value={formData.from}
-                    onChange={handleChange}
-                    error={errors.from}
-                    className="pl-10"
-                  />
-                </div>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-4 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg" />
-                  <Input
-                    type="text"
-                    name="to"
-                    placeholder="To:"
-                    value={formData.to}
-                    onChange={handleChange}
-                    error={errors.to}
-                    className="pl-10 sm:pl-12"
-                  />
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('booking_form.from_label')}
+                  </label>
+                  <div className="relative">
+                    <MapPin className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-4 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`} />
+                    <Input
+                      type="text"
+                      name="from"
+                      placeholder={t('booking_form.from_placeholder')}
+                      value={formData.from}
+                      onChange={handleChange}
+                      error={errors.from}
+                      className={isRTL() ? 'pr-10' : 'pl-10'}
+                      maxLength={100}
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Estimated Distance (km):
+                    {t('booking_form.to_label')}
+                  </label>
+                  <div className="relative">
+                    <MapPin className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-4 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`} />
+                    <Input
+                      type="text"
+                      name="to"
+                      placeholder={t('booking_form.to_placeholder')}
+                      value={formData.to}
+                      onChange={handleChange}
+                      error={errors.to}
+                      className={isRTL() ? 'pr-10 sm:pr-12' : 'pl-10 sm:pl-12'}
+                      maxLength={100}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('booking_form.distance_label')}
                   </label>
                   <Input
                     type="number"
                     name="distanceKm"
-                    placeholder="e.g. 15"
+                    placeholder={t('booking_form.distance_placeholder')}
                     value={formData.distanceKm}
                     onChange={handleChange}
                     error={errors.distanceKm}
@@ -422,33 +465,34 @@ export default function BookingInterface() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Date:
+                    {t('booking_form.date_label')}
                   </label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg" />
+                    <Calendar className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`} />
                     <Input
                       type="date"
                       name="date"
                       value={formData.date}
                       onChange={handleChange}
                       error={errors.date}
-                      className="pl-10 sm:pl-12"
+                      className={isRTL() ? 'pr-10 sm:pr-12' : 'pl-10 sm:pl-12'}
+                      min={new Date().toISOString().split('T')[0]}
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Time:
+                    {t('booking_form.time_label')}
                   </label>
                   <div className="relative">
-                    <Clock className="absolute left-3 top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg" />
+                    <Clock className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`} />
                     <Input
                       type="time"
                       name="time"
                       value={formData.time}
                       onChange={handleChange}
                       error={errors.time}
-                      className="pl-10 sm:pl-12"
+                      className={isRTL() ? 'pr-10 sm:pr-12' : 'pl-10 sm:pl-12'}
                     />
                   </div>
                 </div>
@@ -458,35 +502,36 @@ export default function BookingInterface() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Passenger Name:
+                    {t('booking_form.passenger_name_label')}
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg" />
+                    <User className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`} />
                     <Input
                       type="text"
                       name="passengerName"
-                      placeholder="Name"
+                      placeholder={t('booking_form.passenger_name_placeholder')}
                       value={formData.passengerName}
                       onChange={handleChange}
                       error={errors.passengerName}
-                      className="pl-10"
+                      className={isRTL() ? 'pr-10' : 'pl-10'}
+                      maxLength={100}
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Contact Number:
+                    {t('booking_form.contact_number_label')}
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg" />
+                    <Phone className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`} />
                     <Input
                       type="tel"
                       name="contactNumber"
-                      placeholder="+92XXXXXXXXXX or 03XXXXXXXXX"
+                      placeholder={t('booking_form.contact_placeholder')}
                       value={formData.contactNumber}
                       onChange={handleChange}
                       error={errors.contactNumber}
-                      className="pl-10"
+                      className={isRTL() ? 'pr-10' : 'pl-10'}
                     />
                   </div>
                 </div>
@@ -496,35 +541,35 @@ export default function BookingInterface() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Email:
+                    {t('booking_form.email_label')}
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg" />
+                    <Mail className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`} />
                     <Input
                       type="email"
                       name="email"
-                      placeholder="Email"
+                      placeholder={t('booking_form.email_placeholder')}
                       value={formData.email}
                       onChange={handleChange}
                       error={errors.email}
-                      className="pl-10"
+                      className={isRTL() ? 'pr-10' : 'pl-10'}
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    No of Passengers:
+                    {t('booking_form.passengers_label')}
                   </label>
                   <div className="relative">
-                    <Users className="absolute left-3 top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg" />
+                    <Users className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`} />
                     <Input
                       type="text"
                       name="numberOfPassengers"
-                      placeholder="e.g. (1-7)"
+                      placeholder={t('booking_form.passengers_placeholder')}
                       value={formData.numberOfPassengers}
                       onChange={handleChange}
                       error={errors.numberOfPassengers}
-                      className="pl-10"
+                      className={isRTL() ? 'pr-10' : 'pl-10'}
                     />
                   </div>
                 </div>
@@ -533,25 +578,31 @@ export default function BookingInterface() {
               {/* Special Requirements */}
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Special Requirements (Optional)
+                  {t('booking_form.special_req_label')} <span className="text-xs text-gray-500">({formData.specialRequirements.length}/500)</span>
                 </label>
                 <div className="relative">
-                  <MessageSquare className="absolute left-3 top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg z-10" />
+                  <MessageSquare className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg z-10`} />
                   <textarea
                     name="specialRequirements"
-                    placeholder="Requirements..."
+                    placeholder={t('booking_form.special_req_placeholder')}
                     value={formData.specialRequirements}
                     onChange={handleChange}
                     rows={2}
-                    className="w-full px-4 py-3 pl-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 focus:border-auth-btn-bg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-auth-btn-bg/30 transition-all resize-none text-sm"
+                    maxLength={500}
+                    className={`w-full px-4 py-3 ${isRTL() ? 'pr-10' : 'pl-10'} rounded-lg border-2 border-gray-300 dark:border-gray-600 focus:border-auth-btn-bg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-auth-btn-bg/30 transition-all resize-none text-sm`}
                   />
+                  {errors.specialRequirements && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.specialRequirements}
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* Vehicle Selection */}
               <div>
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Choose Vehicle:
+                  {t('booking_form.choose_vehicle')}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {vehicles.map((vehicle) => (
@@ -574,7 +625,7 @@ export default function BookingInterface() {
                             className="object-contain"
                           />
                           {/* Seat count badge */}
-                          <div className="absolute -top-1 -right-1 bg-auth-btn-bg text-white  dark:text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                          <div className="absolute -top-1 -right-1 bg-auth-btn-bg text-white dark:text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                             {vehicle.seats}
                           </div>
                         </div>
@@ -650,10 +701,10 @@ export default function BookingInterface() {
                 {submitting ? (
                   <span className="flex items-center justify-center gap-2">
                     <Spinner size="sm" />
-                    Submitting...
+                    {t('booking_form.submitting')}
                   </span>
                 ) : (
-                  "Book Ride"
+                  t('booking_form.book_ride_button')
                 )}
               </Button>
             </div>

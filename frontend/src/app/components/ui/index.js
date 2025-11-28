@@ -154,3 +154,9 @@ export const Divider = ({ text, className = "" }) => {
     </div>
   );
 };
+
+// Pagination Component
+export { Pagination } from "./Pagination";
+
+// Localized Pagination Component
+export { default as PaginationWithI18n } from "./PaginationWithI18n";

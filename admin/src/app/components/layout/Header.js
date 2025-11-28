@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Menu, Bell, Search, LogOut, ChevronDown,User } from "lucide-react";
+import { Menu, LogOut, ChevronDown, User } from "lucide-react";
 import Image from "next/image";
 
 const Header = ({ onMenuClick, title = "Dashboard" }) => {
@@ -88,25 +88,6 @@ const Header = ({ onMenuClick, title = "Dashboard" }) => {
           </div>
           
           <div className="flex items-center space-x-4">
-            {/* Search Bar - Optional */}
-            <div className="relative hidden xl:block">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search..."
-                className="pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary text-sm"
-              />
-            </div>
-
-            {/* Notifications */}
-            <button className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-              <Bell className="w-5 h-5" />
-              {/* Notification dot */}
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            
             {/* User Profile */}
             <div className="relative">
               <button

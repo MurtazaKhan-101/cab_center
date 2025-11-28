@@ -13,7 +13,7 @@ export const AuthLayout = ({ children, title, subtitle }) => {
               <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 {title}
               </h2>
-              {subtitle && (
+              {subtitle && (  
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   {subtitle}
                 </p>
@@ -27,7 +27,14 @@ export const AuthLayout = ({ children, title, subtitle }) => {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            By continuing, you agree to our User Agreement and Privacy Policy.
+            By continuing, you agree to our{' '}
+            <a href="#" className="text-[#00188F] hover:underline">
+              Terms of Service
+            </a>{' '}
+            and{' '}
+            <a href="#" className="text-[#00188F] hover:underline">
+              Privacy Policy
+            </a>
           </p>
         </div>
       </div>

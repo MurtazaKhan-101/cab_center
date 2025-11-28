@@ -4,11 +4,14 @@ import { useState, useCallback, memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "../../../lib/i18n";
+import LanguageSwitcher from "../ui/LanguageSwitcher";
 
 const HeaderComponent = ({ user, onLogout, loading = false }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const pathname = usePathname();
+  const { t, isRTL } = useTranslation();
 
   // Helper function to determine if a link is active
   const isActiveLink = useCallback((href) => {
@@ -242,21 +245,26 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
               href="/dashboard"
               className={getLinkClasses("/dashboard")}
             >
-              Home
+              {t('navigation.home') || 'Home'}
             </Link>
             <Link
               href="/booking"
               className={getLinkClasses("/booking")}
             >
-              Booking
+              {t('navigation.booking') || 'Booking'}
             </Link>
             <Link
               href="/history"
               className={getLinkClasses("/history")}
             >
-              History
+              {t('navigation.history') || 'History'}
             </Link>
           </nav>
+
+          {/* Language Switcher - Desktop */}
+          <div className="hidden md:flex items-center space-x-4">
+            <LanguageSwitcher />
+          </div>
 
           {/* User Menu - Desktop */}
           {renderUserSection()}
@@ -304,22 +312,27 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
                 className={`${getLinkClasses("/dashboard", true)} text-base`}
                 onClick={handleMenuClose}
               >
-                Home
+                {t('navigation.home') || 'Home'}
               </Link>
               <Link
                 href="/booking"
                 className={`${getLinkClasses("/booking", true)} text-base`}
                 onClick={handleMenuClose}
               >
-                Booking
+                {t('navigation.booking') || 'Booking'}
               </Link>
               <Link
                 href="/history"
                 className={`${getLinkClasses("/history", true)} text-base`}
                 onClick={handleMenuClose}
               >
-                History
+                {t('navigation.history') || 'History'}
               </Link>
+
+              {/* Language Switcher - Mobile */}
+              <div className="pt-2">
+                <LanguageSwitcher />
+              </div>
 
               {/* Mobile User Section */}
               <div className="border-t border-white/20 pt-4 mt-4">

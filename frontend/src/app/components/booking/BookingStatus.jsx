@@ -3,13 +3,16 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button, Card, Spinner, Alert } from "../ui";
+import PaginationWithI18n from "../ui/PaginationWithI18n";
 import { getMyBookings } from "../../lib/booking";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "../../../lib/i18n";
 
 export const BookingStatus = () => {
   const { loading: authLoading, isAuthenticated } = useAuth();
+  const { t, isRTL } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const entriesPerPage = 4;
+  const entriesPerPage = 10;
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,14 +44,14 @@ export const BookingStatus = () => {
         }
       } catch (err) {
         console.error("Error fetching bookings:", err);
-        setError("Failed to load booking status. Please try again.");
+        setError(t('messages.fetch_error_status'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchBookings();
-  }, [authLoading, isAuthenticated]);
+  }, [authLoading, isAuthenticated, t]);
 
   // Calculate pagination
   const totalPages = Math.ceil(bookings.length / entriesPerPage);
@@ -75,11 +78,11 @@ export const BookingStatus = () => {
 
   const getStatusBadge = (status) => {
     const statusLower = status?.toLowerCase();
-    const statusDisplay =
-      status?.charAt(0).toUpperCase() + status?.slice(1).toLowerCase();
+    let statusDisplay;
 
     switch (statusLower) {
-      case "approved":
+      case "approved":     
+        statusDisplay = t('booking_status.status_approved');
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
             <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
@@ -87,6 +90,7 @@ export const BookingStatus = () => {
           </span>
         );
       case "pending":
+        statusDisplay = t('booking_status.status_pending');
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-yellow-500 text-white">
             <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
@@ -94,6 +98,7 @@ export const BookingStatus = () => {
           </span>
         );
       case "rejected":
+        statusDisplay = t('booking_status.status_rejected');
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
             <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
@@ -101,6 +106,7 @@ export const BookingStatus = () => {
           </span>
         );
       case "cancelled":
+        statusDisplay = t('booking_status.status_cancelled');
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
             <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
@@ -108,10 +114,11 @@ export const BookingStatus = () => {
           </span>
         );
       default:
+        statusDisplay = t('booking_status.status_unknown');
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-500 text-white">
             <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-            {statusDisplay || "Unknown"}
+            {statusDisplay}
           </span>
         );
     }
@@ -139,7 +146,7 @@ export const BookingStatus = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900  p-4 sm:p-6">
+    <div className={`min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 ${isRTL() ? 'rtl' : 'ltr'}`}>
       <div className="max-w-6xl mx-auto">
         {/* Main Card Container */}
         <Card className="bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden">
@@ -156,14 +163,14 @@ export const BookingStatus = () => {
             )}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 text-center sm:text-left">
-                Booking Status
+                {t('booking_status.title')}
               </h1>
               <Button
                 onClick={handleBookNow}
                 className="bg-[#00188F] hover:bg-[#000729] text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105 flex items-center gap-2 border-none text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
-                <span>Book Now</span>
+                <span>{t('booking_status.book_now_button')}</span>
               </Button>
             </div>
           </div>
@@ -174,22 +181,22 @@ export const BookingStatus = () => {
               <thead>
                 <tr className="bg-[#5C88D7] text-white">
                   <th className="px-6 py-3 text-center text-sm font-semibold">
-                    Sr.
+                    {t('booking_status.table_sr')}
                   </th>
                   <th className="px-6 py-3 text-center text-sm font-semibold">
-                    Pickup
+                    {t('booking_status.table_pickup')}
                   </th>
                   <th className="px-6 py-3 text-center text-sm font-semibold">
-                    Destination
+                    {t('booking_status.table_destination')}
                   </th>
                   <th className="px-6 py-3 text-center text-sm font-semibold">
-                    Date
+                    {t('booking_status.table_date')}
                   </th>
                   <th className="px-6 py-3 text-center text-sm font-semibold">
-                    Time
+                    {t('booking_status.table_time')}
                   </th>
                   <th className="px-6 py-3 text-center text-sm font-semibold">
-                    Status
+                    {t('booking_status.table_status')}
                   </th>
                 </tr>
               </thead>
@@ -200,8 +207,7 @@ export const BookingStatus = () => {
                       colSpan="6"
                       className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
                     >
-                      No active bookings found. All bookings are either
-                      completed or cancelled.
+                      {t('booking_status.no_active_bookings')}
                     </td>
                   </tr>
                 ) : (
@@ -243,8 +249,7 @@ export const BookingStatus = () => {
           <div className="md:hidden p-4 space-y-4">
             {currentBookings.length === 0 ? (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                No active bookings found. All bookings are either completed or
-                cancelled.
+                {t('booking_status.no_active_bookings')}
               </div>
             ) : (
               currentBookings.map((booking, index) => (
@@ -266,7 +271,7 @@ export const BookingStatus = () => {
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
                       <span className="text-gray-600 dark:text-gray-400 block mb-1">
-                        Pickup
+                        {t('booking_status.table_pickup')}
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
                         {booking.pickup}
@@ -275,7 +280,7 @@ export const BookingStatus = () => {
 
                     <div>
                       <span className="text-gray-600 dark:text-gray-400 block mb-1">
-                        Destination
+                        {t('booking_status.table_destination')}
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
                         {booking.drop}
@@ -284,7 +289,7 @@ export const BookingStatus = () => {
 
                     <div>
                       <span className="text-gray-600 dark:text-gray-400 block mb-1">
-                        Date
+                        {t('booking_status.table_date')}
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
                         {formatDate(booking.date)}
@@ -293,7 +298,7 @@ export const BookingStatus = () => {
 
                     <div>
                       <span className="text-gray-600 dark:text-gray-400 block mb-1">
-                        Time
+                        {t('booking_status.table_time')}
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
                         {formatTime(booking.time)}
@@ -306,35 +311,14 @@ export const BookingStatus = () => {
           </div>
 
           {/* Footer with Pagination */}
-          <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              {/* Entry count */}
-              <p className="text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
-                Showing {Math.min(currentBookings.length, entriesPerPage)} of{" "}
-                {bookings.length} entries
-              </p>
-
-              {/* Pagination controls */}
-              <div className="flex items-center gap-2 order-1 sm:order-2">
-                <Button
-                  variant="outline"
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 text-sm bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 border-none"
-                >
-                  ← Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 text-sm bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 border-none"
-                >
-                  Next →
-                </Button>
-              </div>
-            </div>
-          </div>
+          <PaginationWithI18n
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={bookings.length}
+            itemsPerPage={entriesPerPage}
+            onPrevPage={handlePrevPage}
+            onNextPage={handleNextPage}
+          />
         </Card>
       </div>
     </div>
