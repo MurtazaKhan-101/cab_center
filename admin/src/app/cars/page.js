@@ -128,6 +128,8 @@ export default function CarsPage() {
   );
 
   const handleAddCar = async (carData) => {
+    const toastId = showToast.loading("Adding vehicle...");
+
     try {
       const response = await vehicleService.createVehicle({
         registration_number: carData.registrationNumber,
@@ -135,7 +137,7 @@ export default function CarsPage() {
         vehicle_type: carData.category.toLowerCase(),
         year: parseInt(carData.year),
         capacity: parseInt(carData.capacity || 4),
-        fare_per_km: parseFloat(carData.farePerKm || 10),
+        farePerKm: parseFloat(carData.farePerKm || 10),
         availability_status: "available",
       });
 
@@ -157,6 +159,9 @@ export default function CarsPage() {
 
         setCars([...cars, transformedVehicle]);
         setShowAddModal(false);
+        showToast.success("Vehicle added successfully!", toastId);
+      } else {
+        showToast.error(response.message || "Failed to add vehicle", toastId);
       }
     } catch (error) {
       console.error("Error adding vehicle:", error);
@@ -165,6 +170,8 @@ export default function CarsPage() {
   };
 
   const handleEditCar = async (carData) => {
+    const toastId = showToast.loading("Updating vehicle...");
+
     try {
       const response = await vehicleService.updateVehicle(carData.id, {
         registration_number: carData.registrationNumber,
@@ -172,16 +179,23 @@ export default function CarsPage() {
         vehicle_type: carData.category.toLowerCase(),
         year: parseInt(carData.year),
         capacity: parseInt(carData.capacity || 4),
-        fare_per_km: parseFloat(carData.farePerKm || 10),
+        farePerKm: parseFloat(carData.farePerKm || 10),
         availability_status: carData.status,
       });
 
       if (response.success) {
         setCars(cars.map((car) => (car.id === carData.id ? carData : car)));
         setSelectedCar(carData);
+        showToast.success("Vehicle updated successfully!", toastId);
+      } else {
+        showToast.error(
+          response.message || "Failed to update vehicle",
+          toastId
+        );
       }
     } catch (error) {
       console.error("Error updating vehicle:", error);
+      showToast.error("Failed to update vehicle. Please try again.", toastId);
     }
   };
 

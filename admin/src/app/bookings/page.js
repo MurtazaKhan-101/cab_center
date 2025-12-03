@@ -62,11 +62,12 @@ export default function BookingsPage() {
             phone: b.contact_number,
             date: new Date(b.date).toLocaleDateString("en-GB"),
             time: b.time,
+            paymentMethod: b.payment_method,
             status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
             rawStatus: b.status,
             customerType: "Regular",
             distance: `${b.distance_km} km`,
-            estimatedFare: `PKR ${b.total_fare}`,
+            estimatedFare: `SAR ${b.total_fare}`,
             assignedDriver: b.driver_id?.name || null,
             assignedVehicle: b.vehicle_id
               ? `${b.vehicle_id.registration_number} - ${b.vehicle_id.model}`
@@ -333,7 +334,7 @@ export default function BookingsPage() {
           status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
           customerType: "Regular",
           distance: `${b.distance_km} km`,
-          estimatedFare: `PKR ${b.total_fare}`,
+          estimatedFare: `SAR ${b.total_fare}`,
           assignedDriver: b.driver_id?.name || null,
           assignedVehicle: b.driver_id?.vehicle_id
             ? `${b.driver_id.vehicle_id.registration_number} - ${b.driver_id.vehicle_id.model}`

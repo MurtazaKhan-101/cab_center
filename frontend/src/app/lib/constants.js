@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
   MY_BOOKINGS: "/api/bookings/my-bookings",
   CANCEL_BOOKING: (id) => `/api/bookings/${id}/cancel`,
   GET_BOOKING: (id) => `/api/bookings/${id}`,
+  CALCULATE_FARE: "/api/bookings/calculate-fare",
 
   // Vehicle endpoints (Public)
   VEHICLE_TYPES: "/api/vehicles/types",

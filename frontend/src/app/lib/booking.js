@@ -1,6 +1,19 @@
 import apiClient from "./api";
 import { API_ENDPOINTS } from "./constants";
 
+// Calculate fare
+export const calculateFare = async (fareData) => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.CALCULATE_FARE,
+      fareData
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Create a new booking
 export const createBooking = async (bookingData) => {
   try {

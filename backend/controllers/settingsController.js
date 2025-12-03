@@ -66,12 +66,27 @@ class SettingsController {
   // Add rush hour (Admin)
   async addRushHour(req, res) {
     try {
-      const { name, start_time, end_time, multiplier } = req.body;
+      const {
+        name,
+        start_time,
+        end_time,
+        multiplier,
+        days_of_week,
+        locations,
+      } = req.body;
 
-      if (!name || !start_time || !end_time || !multiplier) {
+      if (
+        !name ||
+        !start_time ||
+        !end_time ||
+        !multiplier ||
+        !days_of_week ||
+        !locations
+      ) {
         return res.status(400).json({
           success: false,
-          message: "Name, start time, end time, and multiplier are required",
+          message:
+            "Name, start time, end time, multiplier, days of week, and locations are required",
         });
       }
 
@@ -79,6 +94,41 @@ class SettingsController {
         return res.status(400).json({
           success: false,
           message: "Multiplier must be at least 1",
+        });
+      }
+
+      if (!Array.isArray(days_of_week) || days_of_week.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one day of week must be selected",
+        });
+      }
+
+      if (!Array.isArray(locations) || locations.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one location must be specified",
+        });
+      }
+
+      const validDays = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+      ];
+      const invalidDays = days_of_week.filter(
+        (day) => !validDays.includes(day.toLowerCase())
+      );
+      if (invalidDays.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid days: ${invalidDays.join(
+            ", "
+          )}. Valid days are: ${validDays.join(", ")}`,
         });
       }
 
@@ -92,6 +142,8 @@ class SettingsController {
         start_time,
         end_time,
         multiplier,
+        days_of_week: days_of_week.map((day) => day.toLowerCase()),
+        locations: locations.map((loc) => loc.trim()),
       });
 
       await settings.save();
@@ -115,7 +167,71 @@ class SettingsController {
   async updateRushHour(req, res) {
     try {
       const { id } = req.params;
-      const { name, start_time, end_time, multiplier } = req.body;
+      const {
+        name,
+        start_time,
+        end_time,
+        multiplier,
+        days_of_week,
+        locations,
+      } = req.body;
+
+      if (
+        !name ||
+        !start_time ||
+        !end_time ||
+        !multiplier ||
+        !days_of_week ||
+        !locations
+      ) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Name, start time, end time, multiplier, days of week, and locations are required",
+        });
+      }
+
+      if (multiplier < 1) {
+        return res.status(400).json({
+          success: false,
+          message: "Multiplier must be at least 1",
+        });
+      }
+
+      if (!Array.isArray(days_of_week) || days_of_week.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one day of week must be selected",
+        });
+      }
+
+      if (!Array.isArray(locations) || locations.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one location must be specified",
+        });
+      }
+
+      const validDays = [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+      ];
+      const invalidDays = days_of_week.filter(
+        (day) => !validDays.includes(day.toLowerCase())
+      );
+      if (invalidDays.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid days: ${invalidDays.join(
+            ", "
+          )}. Valid days are: ${validDays.join(", ")}`,
+        });
+      }
 
       let settings = await Settings.findOne();
       if (!settings) {
@@ -133,18 +249,12 @@ class SettingsController {
         });
       }
 
-      if (name) rushHour.name = name;
-      if (start_time) rushHour.start_time = start_time;
-      if (end_time) rushHour.end_time = end_time;
-      if (multiplier !== undefined) {
-        if (multiplier < 1) {
-          return res.status(400).json({
-            success: false,
-            message: "Multiplier must be at least 1",
-          });
-        }
-        rushHour.multiplier = multiplier;
-      }
+      rushHour.name = name;
+      rushHour.start_time = start_time;
+      rushHour.end_time = end_time;
+      rushHour.multiplier = multiplier;
+      rushHour.days_of_week = days_of_week.map((day) => day.toLowerCase());
+      rushHour.locations = locations.map((loc) => loc.trim());
 
       await settings.save();
 

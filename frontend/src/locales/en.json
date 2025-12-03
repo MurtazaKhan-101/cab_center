@@ -62,7 +62,9 @@
     "special_req_placeholder": "Requirements...",
     "choose_vehicle": "Choose Vehicle:",
     "book_ride_button": "Book Ride",
+    "proceed_to_checkout": "Proceed to Checkout",
     "submitting": "Submitting...",
+    "calculating": "Calculating fare...",
     "vehicle_capacity": "{seats} seats",
     "price_per_km": "SAR {price}/km"
   },
@@ -125,6 +127,7 @@
   "messages": {
     "booking_success": "Booking request submitted successfully! Estimated fare: {fare} SAR. You will receive confirmation via email shortly.",
     "booking_failed": "Booking submission failed. Please try again.",
+    "fare_calculation_failed": "Failed to calculate fare. Please try again.",
     "fetch_error_status": "Failed to load booking status. Please try again.",
     "fetch_error_history": "Failed to load booking history. Please try again.",
     "correct_errors": "Please correct the errors below and try again."
@@ -216,5 +219,30 @@
     "reset_code_sent": "Reset code sent successfully!",
     "otp_sent": "OTP sent successfully!",
     "password_reset_success": "Password reset successful! Redirecting to login..."
+  },
+  "checkout": {
+    "title": "Checkout",
+    "booking_summary": "Booking Summary",
+    "trip_details": "Trip Details",
+    "passenger_details": "Passenger Details",
+    "vehicle_details": "Vehicle Details",
+    "fare_breakdown": "Fare Breakdown",
+    "base_fare": "Base Fare",
+    "total_fare": "Total Fare",
+    "payment_method": "Payment Method",
+    "payment_cash": "Cash Payment",
+    "payment_card": "Card Payment",
+    "payment_cash_desc": "Pay the driver upon arrival",
+    "payment_card_desc": "Pay online with your credit/debit card",
+    "payment_method_required": "Please select a payment method",
+    "confirm_booking": "Confirm Booking",
+    "processing": "Processing...",
+    "payment_info": "Your payment information is secure and encrypted"
+  },
+  "common": {
+    "back": "Back",
+    "km": "km",
+    "passengers": "passengers",
+    "currency_sar": "SAR"
   }
 }

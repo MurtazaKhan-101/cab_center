@@ -10,7 +10,7 @@ class VehicleController {
         registration_number,
         model,
         year,
-        fare_per_km,
+        farePerKm,
         capacity,
         assigned_driver_id,
       } = req.body;
@@ -21,7 +21,7 @@ class VehicleController {
         !registration_number ||
         !model ||
         !year ||
-        fare_per_km === undefined ||
+        farePerKm === undefined ||
         !capacity
       ) {
         return res.status(400).json({
@@ -64,7 +64,7 @@ class VehicleController {
         registration_number: registration_number.toUpperCase(),
         model,
         year,
-        fare_per_km,
+        fare_per_km: farePerKm,
         capacity,
         assigned_driver_id: assigned_driver_id || null,
         availability_status: "available",

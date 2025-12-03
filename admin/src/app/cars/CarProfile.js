@@ -2,42 +2,68 @@
 
 import { useState } from "react";
 import { Button } from "../components/ui";
-import { ArrowLeft, Edit, Trash2, Car, Calendar, Settings, Users, CreditCard, MapPin, Fuel, Wrench } from 'lucide-react';
-import { showToast } from '../lib/toast';
+import {
+  ArrowLeft,
+  Edit,
+  Trash2,
+  Car,
+  Calendar,
+  Settings,
+  Users,
+  CreditCard,
+  MapPin,
+  Fuel,
+  Wrench,
+  DollarSign,
+} from "lucide-react";
+import { showToast } from "../lib/toast";
 
-export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, initialEditMode = false }) {
+export default function CarProfile({
+  car,
+  onBack,
+  onEdit,
+  onDelete,
+  onSave,
+  initialEditMode = false,
+}) {
   const [isEditing, setIsEditing] = useState(initialEditMode);
   const [editFormData, setEditFormData] = useState({
     category: car?.category || "",
     registrationNumber: car?.registrationNumber || "",
     model: car?.model || "",
     year: car?.year || "",
-    availability: car?.availability || "Available"
+    capacity: car?.capacity || "",
+    farePerKm: car?.farePerKm || "",
+    availability: car?.availability || "Available",
   });
 
   const handleInputChange = (field, value) => {
-    setEditFormData(prev => ({
+    setEditFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSave = async () => {
     // Validate required fields
-    if (!editFormData.category.trim() || !editFormData.registrationNumber.trim() || !editFormData.model.trim() || !editFormData.year) {
+    if (
+      !editFormData.category.trim() ||
+      !editFormData.registrationNumber.trim() ||
+      !editFormData.model.trim() ||
+      !editFormData.year ||
+      !editFormData.capacity ||
+      !editFormData.farePerKm
+    ) {
       showToast.error("Please fill in all required fields");
       return;
     }
 
-    const toastId = showToast.loading("Updating vehicle...");
-    
     try {
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Preserve the original assignedTo value since it's managed from driver side
       onSave({ ...car, ...editFormData, assignedTo: car.assignedTo });
-      showToast.success("Vehicle updated successfully!", toastId);
       setIsEditing(false);
     } catch (error) {
       showToast.error("Failed to update vehicle. Please try again.", toastId);
@@ -50,22 +76,26 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
       registrationNumber: car?.registrationNumber || "",
       model: car?.model || "",
       year: car?.year || "",
-      availability: car?.availability || "Available"
+      capacity: car?.capacity || "",
+      farePerKm: car?.farePerKm || "",
+      availability: car?.availability || "Available",
     });
     setIsEditing(false);
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${car.model} (${car.registrationNumber})? This action cannot be undone.`);
-    
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete ${car.model} (${car.registrationNumber})? This action cannot be undone.`
+    );
+
     if (!confirmDelete) return;
-    
+
     const toastId = showToast.loading("Deleting vehicle...");
-    
+
     try {
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       onDelete(car.id);
       showToast.success("Vehicle deleted successfully!", toastId);
     } catch (error) {
@@ -78,9 +108,15 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
       <div className="min-h-screen bg-gray-50 dark:bg-[#111827] flex items-center justify-center p-4">
         <div className="text-center">
           <Car className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Vehicle Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">The vehicle you are looking for doesnot exist.</p>
-          <Button onClick={onBack} variant="primary">Go Back</Button>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            Vehicle Not Found
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            The vehicle you are looking for doesnot exist.
+          </p>
+          <Button onClick={onBack} variant="primary">
+            Go Back
+          </Button>
         </div>
       </div>
     );
@@ -91,15 +127,19 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
         <div className="flex items-center space-x-4">
-            <Button
-              onClick={onBack}
-              className="p-2 w-12 h-12 flex items-center justify-center bg-buttons-gradient"
-            >
-              <ArrowLeft className="w-8 h-8 text-white" />
-            </Button>
+          <Button
+            onClick={onBack}
+            className="p-2 w-12 h-12 flex items-center justify-center bg-buttons-gradient"
+          >
+            <ArrowLeft className="w-8 h-8 text-white" />
+          </Button>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">Vehicle Profile</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">View and manage vehicle information</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
+              Vehicle Profile
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              View and manage vehicle information
+            </p>
           </div>
         </div>
       </div>
@@ -113,8 +153,12 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
               <MapPin className="w-6 h-6 text-white dark:text-blue-400 group-hover:text-white" />
             </div>
             <div className="text-right">
-              <p className="text-xs text-white dark:text-gray-400 group-hover:text-white/80 uppercase tracking-wider">Total Trips</p>
-              <p className="text-2xl font-bold text-white dark:text-gray-100 group-hover:text-white">152</p>
+              <p className="text-xs text-white dark:text-gray-400 group-hover:text-white/80 uppercase tracking-wider">
+                Total Trips
+              </p>
+              <p className="text-2xl font-bold text-white dark:text-gray-100 group-hover:text-white">
+                152
+              </p>
             </div>
           </div>
         </div>
@@ -126,8 +170,12 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
               <Car className="w-6 h-6 text-green-600 dark:text-green-400 group-hover:text-white" />
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-white/80 uppercase tracking-wider">Monthly Distance</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-white">2,340<span className="text-sm font-normal">km</span></p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-white/80 uppercase tracking-wider">
+                Monthly Distance
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-white">
+                2,340<span className="text-sm font-normal">km</span>
+              </p>
             </div>
           </div>
         </div>
@@ -139,8 +187,12 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
               <Fuel className="w-6 h-6 text-purple-600 dark:text-purple-400 group-hover:text-white" />
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-white/80 uppercase tracking-wider">Fuel Efficiency</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-white">12.5<span className="text-sm font-normal">L/100km</span></p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-white/80 uppercase tracking-wider">
+                Fuel Efficiency
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-white">
+                12.5<span className="text-sm font-normal">L/100km</span>
+              </p>
             </div>
           </div>
         </div>
@@ -166,7 +218,9 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
               {isEditing ? (
                 <select
                   value={editFormData.category}
-                  onChange={(e) => handleInputChange('category', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("category", e.target.value)
+                  }
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
                 >
                   <option value="">Select category</option>
@@ -191,7 +245,9 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
                 <input
                   type="text"
                   value={editFormData.registrationNumber}
-                  onChange={(e) => handleInputChange('registrationNumber', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("registrationNumber", e.target.value)
+                  }
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
                 />
               ) : (
@@ -211,7 +267,7 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
                 <input
                   type="text"
                   value={editFormData.model}
-                  onChange={(e) => handleInputChange('model', e.target.value)}
+                  onChange={(e) => handleInputChange("model", e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
                 />
               ) : (
@@ -230,17 +286,71 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
               {isEditing ? (
                 <select
                   value={editFormData.year}
-                  onChange={(e) => handleInputChange('year', e.target.value)}
+                  onChange={(e) => handleInputChange("year", e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
                 >
                   <option value="">Select year</option>
-                  {Array.from({ length: 20 }, (_, i) => 2025 - i).map(year => (
-                    <option key={year} value={year}>{year}</option>
-                  ))}
+                  {Array.from({ length: 20 }, (_, i) => 2025 - i).map(
+                    (year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    )
+                  )}
                 </select>
               ) : (
                 <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">
                   {car.year}
+                </div>
+              )}
+            </div>
+
+            {/* Capacity */}
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Users className="w-4 h-4" />
+                <span>Capacity</span>
+              </label>
+              {isEditing ? (
+                <input
+                  type="number"
+                  value={editFormData.capacity}
+                  onChange={(e) =>
+                    handleInputChange("capacity", e.target.value)
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                  min="1"
+                  max="20"
+                  placeholder="e.g., 4"
+                />
+              ) : (
+                <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">
+                  {car.capacity} passengers
+                </div>
+              )}
+            </div>
+
+            {/* Fare Per Km */}
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <DollarSign className="w-4 h-4" />
+                <span>Fare Per Km</span>
+              </label>
+              {isEditing ? (
+                <input
+                  type="number"
+                  step="0.01"
+                  value={editFormData.farePerKm}
+                  onChange={(e) =>
+                    handleInputChange("farePerKm", e.target.value)
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                  min="0"
+                  placeholder="e.g., 2.50"
+                />
+              ) : (
+                <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">
+                  SAR {car.farePerKm}/km
                 </div>
               )}
             </div>
@@ -270,7 +380,9 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
               {isEditing ? (
                 <select
                   value={editFormData.availability}
-                  onChange={(e) => handleInputChange('availability', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("availability", e.target.value)
+                  }
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
                 >
                   <option value="Available">Available</option>
@@ -278,14 +390,20 @@ export default function CarProfile({ car, onBack, onEdit, onDelete, onSave, init
                 </select>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                    car.availability === 'Available' 
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' 
-                      : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                  }`}>
-                    <span className={`w-2 h-2 rounded-full mr-2 ${
-                      car.availability === 'Available' ? 'bg-green-500' : 'bg-red-500'
-                    }`}></span>
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      car.availability === "Available"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                        : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                    }`}
+                  >
+                    <span
+                      className={`w-2 h-2 rounded-full mr-2 ${
+                        car.availability === "Available"
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
+                    ></span>
                     {car.availability}
                   </span>
                 </div>

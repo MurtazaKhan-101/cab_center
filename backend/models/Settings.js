@@ -22,6 +22,35 @@ const rushHourSchema = new mongoose.Schema({
     min: 1,
     default: 1.5,
   },
+  days_of_week: {
+    type: [String],
+    required: true,
+    enum: [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ],
+    validate: {
+      validator: function (days) {
+        return days && days.length > 0;
+      },
+      message: "At least one day must be selected",
+    },
+  },
+  locations: {
+    type: [String],
+    required: true,
+    validate: {
+      validator: function (locations) {
+        return locations && locations.length > 0;
+      },
+      message: "At least one location must be specified",
+    },
+  },
 });
 
 const settingsSchema = new mongoose.Schema(
@@ -37,7 +66,7 @@ const settingsSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      default: "PKR",
+      default: "SAR",
     },
   },
   {

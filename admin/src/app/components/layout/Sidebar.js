@@ -4,14 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Car, 
-  UserCheck, 
-  Building, 
+import {
+  LayoutDashboard,
+  Users,
+  Car,
+  UserCheck,
+  Building,
   Calendar,
-  X
+  X,
+  Settings,
 } from "lucide-react";
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -48,6 +49,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       href: "/bookings",
       icon: Calendar,
     },
+    {
+      name: "Settings",
+      href: "/settings",
+      icon: Settings,
+    },
   ];
 
   const isActiveRoute = (href) => {
@@ -74,18 +80,19 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           <Link href="/dashboard" className="flex items-center space-x-3">
             <div className="w-10 h-10 relative">
-                <Image
+              <Image
                 src="/images/logo.svg"
                 alt="Cab Centre Logo"
                 width={98}
                 height={98}
                 className=" object-contain"
-                />
-
+              />
             </div>
-            <span className="text-secondary dark:text-white font-bold text-xl">CAB CENTRE</span>
+            <span className="text-secondary dark:text-white font-bold text-xl">
+              CAB CENTRE
+            </span>
           </Link>
-          
+
           {/* Close button for mobile */}
           <button
             onClick={onClose}
@@ -116,10 +123,10 @@ const Sidebar = ({ isOpen, onClose }) => {
                         : "text-gray-700 dark:text-gray-300 hover:bg-secondary hover:text-white"
                     }`}
                   >
-                    <IconComponent 
+                    <IconComponent
                       className={`w-6 h-6 transition-transform duration-200 ${
                         isActiveRoute(item.href) ? "scale-110" : ""
-                      }`} 
+                      }`}
                     />
                     <span className="truncate">{item.name}</span>
                   </Link>

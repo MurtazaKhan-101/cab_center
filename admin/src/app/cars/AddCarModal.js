@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 import { Button } from "../components/ui";
-import { X, Car, CreditCard, Calendar, Users, Settings } from "lucide-react";
+import {
+  X,
+  Car,
+  CreditCard,
+  Calendar,
+  Users,
+  Settings,
+  DollarSign,
+} from "lucide-react";
 import { showToast } from "../lib/toast";
 
 export default function AddCarModal({ isOpen, onClose, onSave }) {
@@ -11,6 +19,8 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
     registrationNumber: "",
     model: "",
     year: "",
+    farePerKm: "",
+    capacity: "",
     availability: "Available",
   });
 
@@ -27,7 +37,9 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
       !formData.category.trim() ||
       !formData.registrationNumber.trim() ||
       !formData.model.trim() ||
-      !formData.year
+      !formData.year ||
+      !formData.farePerKm.trim() ||
+      !formData.capacity.trim()
     ) {
       showToast.error("Please fill in all required fields");
       return;
@@ -54,6 +66,8 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
       registrationNumber: "",
       model: "",
       year: "",
+      farePerKm: "",
+      capacity: "",
       availability: "Available",
     });
     onClose();
@@ -149,6 +163,36 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <DollarSign className="w-4 h-4" />
+                <span>Fare Per Km *</span>
+              </label>
+              <input
+                type="text"
+                placeholder="e.g., 2.50"
+                value={formData.farePerKm}
+                onChange={(e) => handleInputChange("farePerKm", e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Users className="w-4 h-4" />
+                <span>Capacity *</span>
+              </label>
+              <input
+                type="number"
+                placeholder="e.g., 4"
+                value={formData.capacity}
+                onChange={(e) => handleInputChange("capacity", e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                min="1"
+                max="20"
+              />
             </div>
           </div>
 

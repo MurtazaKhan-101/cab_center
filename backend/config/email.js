@@ -50,9 +50,7 @@ const sendOTP = async (email, otp, type = "verification") => {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
           <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <h2 style="color: #333; text-align: center; margin-bottom: 20px;"> ${
-              isPasswordReset
-                ? "Reset your password"
-                : "Welcome to Cab Centre"
+              isPasswordReset ? "Reset your password" : "Welcome to Cab Centre"
             }</h2>
             <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
               ${
@@ -136,7 +134,7 @@ const sendBookingApprovalEmail = async (booking) => {
               <p style="margin: 10px 0;"><strong>Driver Contact:</strong> ${
                 booking.driver_id.contact_number
               }</p>
-              <p style="margin: 10px 0;"><strong>Total Fare:</strong> PKR ${
+              <p style="margin: 10px 0;"><strong>Total Fare:</strong> SAR${
                 booking.total_fare
               }</p>
             </div>

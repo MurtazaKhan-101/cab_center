@@ -4,6 +4,9 @@ const { authenticate, authorize } = require("../middleware/auth");
 
 const router = express.Router();
 
+// Public routes
+router.post("/calculate-fare", bookingController.calculateFare);
+
 // User routes - require authentication
 router.post("/", authenticate, bookingController.createBooking);
 router.get("/my-bookings", authenticate, bookingController.getUserBookings);

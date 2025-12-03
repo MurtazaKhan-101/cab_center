@@ -12,7 +12,13 @@ const moment = require("moment");
 
 class BookingController {
   // Helper function to calculate fare
-  async calculateFare(vehicleType, distanceKm, bookingTime) {
+  async calculateFare(
+    vehicleType,
+    distanceKm,
+    bookingTime,
+    bookingDate,
+    pickupLocation
+  ) {
     try {
       // Get vehicle fare per km
       const vehicle = await Vehicle.findOne({ vehicle_type: vehicleType });
@@ -34,14 +40,33 @@ class BookingController {
       let farePerKm = vehicle.fare_per_km;
       let rushHourMultiplier = 1;
 
-      // Check if booking time falls in rush hours
-      if (bookingTime && settings.rush_hours.length > 0) {
+      // Check if booking falls in any rush hour (time, day, and location must all match)
+      if (
+        bookingTime &&
+        bookingDate &&
+        pickupLocation &&
+        settings.rush_hours.length > 0
+      ) {
         const bookingHour = bookingTime.split(":")[0];
         const bookingMinute = bookingTime.split(":")[1] || "00";
         const bookingTimeValue =
           parseInt(bookingHour) * 60 + parseInt(bookingMinute);
 
+        // Get the day of the week (0 = Sunday, 1 = Monday, etc.)
+        const bookingDayOfWeek = new Date(bookingDate).getDay();
+        const dayNames = [
+          "sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+        ];
+        const bookingDayName = dayNames[bookingDayOfWeek];
+
         for (const rushHour of settings.rush_hours) {
+          // Check time range
           const startParts = rushHour.start_time.split(":");
           const endParts = rushHour.end_time.split(":");
           const startTimeValue =
@@ -49,22 +74,122 @@ class BookingController {
           const endTimeValue =
             parseInt(endParts[0]) * 60 + parseInt(endParts[1] || "0");
 
-          if (
+          const isTimeMatch =
             bookingTimeValue >= startTimeValue &&
-            bookingTimeValue <= endTimeValue
-          ) {
+            bookingTimeValue <= endTimeValue;
+
+          // Check if booking day matches any of the rush hour days
+          const isDayMatch =
+            rushHour.days_of_week && rushHour.days_of_week.length > 0
+              ? rushHour.days_of_week
+                  .map((day) => day.toLowerCase())
+                  .includes(bookingDayName)
+              : true; // If no specific days set, apply to all days
+
+          // Check if pickup location matches any of the rush hour locations
+          const isLocationMatch =
+            rushHour.locations && rushHour.locations.length > 0
+              ? rushHour.locations.some(
+                  (location) =>
+                    pickupLocation
+                      .toLowerCase()
+                      .includes(location.toLowerCase()) ||
+                    location
+                      .toLowerCase()
+                      .includes(pickupLocation.toLowerCase())
+                )
+              : true; // If no specific locations set, apply to all locations
+
+          // Apply multiplier only if ALL conditions are met
+          if (isTimeMatch && isDayMatch && isLocationMatch) {
             rushHourMultiplier = rushHour.multiplier;
-            break;
+            console.log(
+              `Rush hour applied: ${rushHour.name}, Multiplier: ${rushHour.multiplier}x`
+            );
+            console.log(
+              `Time match: ${isTimeMatch}, Day match: ${isDayMatch}, Location match: ${isLocationMatch}`
+            );
+            break; // Use the first matching rush hour
           }
         }
       }
 
-      const totalFare =
-        settings.base_fare + farePerKm * distanceKm * rushHourMultiplier;
+      // Calculate fare with rush hour logic applied only to 5km radius
+      let totalFare;
+      if (rushHourMultiplier > 1) {
+        // Rush hour applies only to first 5km within the location
+        const rushHourRadius = 5; // 5km radius
+        const rushHourDistance = Math.min(distanceKm, rushHourRadius);
+        const normalDistance = Math.max(0, distanceKm - rushHourRadius);
+
+        // Calculate fare for rush hour portion (first 5km or less)
+        const rushHourFare = farePerKm * rushHourDistance * rushHourMultiplier;
+
+        // Calculate fare for normal portion (remaining distance)
+        const normalFare = farePerKm * normalDistance;
+
+        totalFare = settings.base_fare + rushHourFare + normalFare;
+
+        console.log(
+          `Fare breakdown - Rush hour distance: ${rushHourDistance}km at ${rushHourMultiplier}x, Normal distance: ${normalDistance}km at 1x`
+        );
+      } else {
+        // No rush hour, apply normal rates to entire distance
+        totalFare = settings.base_fare + farePerKm * distanceKm;
+      }
+
       return Math.round(totalFare);
     } catch (error) {
       console.error("Error calculating fare:", error);
       throw error;
+    }
+  }
+
+  // Calculate fare endpoint (Public)
+  async calculateFareEndpoint(req, res) {
+    try {
+      const {
+        vehicle_type,
+        distance_km,
+        pickup_location,
+        booking_date,
+        booking_time,
+      } = req.body;
+
+      // Validation
+      if (!vehicle_type || !distance_km) {
+        return res.status(400).json({
+          success: false,
+          message: "Vehicle type and distance are required",
+        });
+      }
+
+      // Calculate fare
+      const fare = await this.calculateFare(
+        vehicle_type,
+        distance_km,
+        booking_time || "12:00",
+        booking_date || new Date().toISOString().split("T")[0],
+        pickup_location || ""
+      );
+
+      res.status(200).json({
+        success: true,
+        fare: fare,
+        currency: "SAR",
+        breakdown: {
+          distance_km: distance_km,
+          vehicle_type: vehicle_type,
+          base_fare: fare,
+        },
+      });
+    } catch (error) {
+      console.error("Error calculating fare:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to calculate fare",
+        error: error.message,
+      });
     }
   }
 
@@ -83,6 +208,7 @@ class BookingController {
         vehicle_type,
         date,
         time,
+        payment_method,
       } = req.body;
 
       // Validation
@@ -95,7 +221,8 @@ class BookingController {
         !drop ||
         !vehicle_type ||
         !date ||
-        !time
+        !time ||
+        !payment_method
       ) {
         return res.status(400).json({
           success: false,
@@ -110,7 +237,9 @@ class BookingController {
       const total_fare = await this.calculateFare(
         vehicle_type,
         distance_km || 0,
-        time
+        time,
+        date,
+        pickup
       );
 
       // Create booking
@@ -127,6 +256,7 @@ class BookingController {
         vehicle_type,
         date: new Date(date),
         time,
+        payment_method,
         total_fare,
         status: "pending",
       });
@@ -587,7 +717,7 @@ class BookingController {
       doc.moveDown(0.5);
       doc
         .fontSize(14)
-        .text(`Total Fare: PKR ${booking.total_fare}`, { bold: true });
+        .text(`Total Fare: SAR${booking.total_fare}`, { bold: true });
       doc.moveDown();
 
       // Footer
@@ -683,6 +813,8 @@ class BookingController {
 const bookingController = new BookingController();
 
 module.exports = {
+  calculateFare:
+    bookingController.calculateFareEndpoint.bind(bookingController),
   createBooking: bookingController.createBooking.bind(bookingController),
   getAllBookings: bookingController.getAllBookings.bind(bookingController),
   getUserBookings: bookingController.getUserBookings.bind(bookingController),

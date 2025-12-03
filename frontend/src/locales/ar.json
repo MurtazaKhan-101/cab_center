@@ -62,7 +62,9 @@
     "special_req_placeholder": "المتطلبات...",
     "choose_vehicle": "اختر المركبة:",
     "book_ride_button": "احجز الرحلة",
+    "proceed_to_checkout": "المتابعة للدفع",
     "submitting": "جاري الإرسال...",
+    "calculating": "جاري حساب الأجرة...",
     "vehicle_capacity": "{seats} مقاعد",
     "price_per_km": "ر.س {price}/كم"
   },
@@ -123,8 +125,9 @@
     "vehicle_select_error": "يرجى اختيار مركبة"
   },
   "messages": {
-    "booking_success": "تم تقديم طلب الحجز بنجاح! الأجرة المقدرة: {fare} ريال سعودي. ستتلقى تأكيدًا عبر البريد الإلكتروني قريبًا.",
+    "booking_success": "تم تقديم طلب الحجز بنجاح! الأجرة المقدرة: {fare} ر.س. ستتلقى تأكيداً عبر البريد الإلكتروني قريباً.",
     "booking_failed": "فشل تقديم الحجز. يرجى المحاولة مرة أخرى.",
+    "fare_calculation_failed": "فشل حساب الأجرة. يرجى المحاولة مرة أخرى.",
     "fetch_error_status": "فشل تحميل حالة الحجز. يرجى المحاولة مرة أخرى.",
     "fetch_error_history": "فشل تحميل سجل الحجز. يرجى المحاولة مرة أخرى.",
     "correct_errors": "يرجى تصحيح الأخطاء أدناه والمحاولة مرة أخرى."
@@ -216,5 +219,30 @@
     "reset_code_sent": "تم إرسال رمز إعادة التعيين بنجاح!",
     "otp_sent": "تم إرسال الرمز بنجاح!",
     "password_reset_success": "تم إعادة تعيين كلمة المرور بنجاح! جاري التوجيه لتسجيل الدخول..."
+  },
+  "checkout": {
+    "title": "الدفع",
+    "booking_summary": "ملخص الحجز",
+    "trip_details": "تفاصيل الرحلة",
+    "passenger_details": "بيانات الراكب",
+    "vehicle_details": "تفاصيل المركبة",
+    "fare_breakdown": "تفصيل الأجرة",
+    "base_fare": "الأجرة الأساسية",
+    "total_fare": "إجمالي الأجرة",
+    "payment_method": "طريقة الدفع",
+    "payment_cash": "دفع نقدي",
+    "payment_card": "دفع بالبطاقة",
+    "payment_cash_desc": "ادفع للسائق عند الوصول",
+    "payment_card_desc": "ادفع عبر الإنترنت باستخدام بطاقتك الائتمانية/المدينة",
+    "payment_method_required": "يرجى اختيار طريقة الدفع",
+    "confirm_booking": "تأكيد الحجز",
+    "processing": "جاري المعالجة...",
+    "payment_info": "معلومات الدفع الخاصة بك آمنة ومشفرة"
+  },
+  "common": {
+    "back": "رجوع",
+    "km": "كم",
+    "passengers": "ركاب",
+    "currency_sar": "ر.س"
   }
 }

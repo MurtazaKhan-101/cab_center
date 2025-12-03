@@ -366,7 +366,7 @@ export default function DriverProfile({
                 />
               ) : (
                 <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">
-                  PKR {driver.monthlySalary || "Not specified"}
+                  SAR{driver.monthlySalary || "Not specified"}
                 </div>
               )}
             </div>
