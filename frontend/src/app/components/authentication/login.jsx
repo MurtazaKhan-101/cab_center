@@ -3,25 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "../../../lib/i18n";
 import { Button, Input, Alert, Spinner, Divider } from "../ui";
 import { ROUTES, API_BASE_URL } from "../../lib/constants";
-import { useTranslation } from "../../../lib/i18n";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function Login() {
-  const { t, isInitialized } = useTranslation();
+export default function LoginWithI18n() {
   const router = useRouter();
   const { login } = useAuth();
-
-  // Prevent content flash during initialization
-  if (!isInitialized) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  const { t, isRTL } = useTranslation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -79,7 +70,10 @@ export default function Login() {
           window.location.href = ROUTES.DASHBOARD;
         }, 1000);
       } else {
-        setAlert({ type: "error", message: result.message || t('errors.login_failed') });
+        setAlert({ 
+          type: "error", 
+          message: result.message || t('errors.login_failed') 
+        });
       }
     } catch (error) {
       setAlert({
@@ -96,14 +90,14 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col lg:flex-row">
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col lg:flex-row ${isRTL() ? 'rtl' : 'ltr'}`}>
       {/* Left Side - Hero Section with Image */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#00188F] to-[#000729] items-center justify-center p-12">
         <div className="text-center text-white max-w-md">
           <div className="mb-8">
             <img
               src="/images/logo.svg"
-              alt="Cab Center"
+              alt={t('auth.logo_alt')}
               className="mx-auto mb-6"
               width={120}
               height={120}
@@ -113,7 +107,6 @@ export default function Login() {
           <p className="text-xl opacity-90 mb-8">
             {t('auth.sign_in_subtitle')}
           </p>
-          <div className="flex justify-center gap-4 mb-8"></div>
           <div className="flex justify-center gap-4 mb-8 ">
             <img src="/images/sedan.svg" alt={t('auth.sedan_alt')} width={76} height={76} />
             <img src="/images/suv.svg " alt={t('auth.suv_alt')} width={76} height={76} />
@@ -173,7 +166,7 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div className="relative">
-                <div className="absolute left-3 top-3 pointer-events-none z-10">
+                <div className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3 pointer-events-none z-10`}>
                   <svg
                     className="h-5 w-5 text-gray-400"
                     fill="none"
@@ -196,13 +189,13 @@ export default function Login() {
                   onChange={handleChange}
                   disabled={loading}
                   error={errors.email}
-                  className="pl-10"
+                  className={isRTL() ? 'pr-10' : 'pl-10'}
                 />
               </div>
 
               {/* Password Field */}
               <div className="relative">
-                <div className="absolute left-3 top-3 pointer-events-none z-10">
+                <div className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3 pointer-events-none z-10`}>
                   <svg
                     className="h-5 w-5 text-gray-400"
                     fill="none"
@@ -225,7 +218,7 @@ export default function Login() {
                   onChange={handleChange}
                   disabled={loading}
                   error={errors.password}
-                  className="pl-10"
+                  className={isRTL() ? 'pr-10' : 'pl-10'}
                 />
               </div>
 
@@ -236,7 +229,7 @@ export default function Login() {
                     type="checkbox"
                     className="rounded border-gray-300 text-[#00188F] focus:border-[#00188F] focus:ring-[#00188F]"
                   />
-                  <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                  <span className={`${isRTL() ? 'mr-2' : 'ml-2'} text-sm text-gray-600 dark:text-gray-400`}>
                     {t('auth.remember_me')}
                   </span>
                 </label>
