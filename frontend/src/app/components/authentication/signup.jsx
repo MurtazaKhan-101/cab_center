@@ -120,13 +120,13 @@ export default function Signup() {
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#00188F] to-[#000729] items-center justify-center p-12">
         <div className="text-center text-white max-w-md">
           <div className="mb-8">
-            <img
+            {/* <img
               src="/images/logo.svg"
               alt={t('auth.logo_alt')}
               className="mx-auto mb-6"
               width={120}
               height={120}
-            />
+            /> */}
 
           </div>
           <h1 className="text-4xl font-bold mb-4">{t('auth.welcome_cab_center')}</h1>
@@ -165,13 +165,13 @@ export default function Signup() {
         <div className="w-full max-w-md">
           {/* Mobile Header */}
           <div className="lg:hidden text-center mb-8">
-            <Image
+            {/* <Image
               src="/images/logo.svg"
               alt={t('auth.logo_alt')}
               width={80}
               height={80}
               className="mx-auto mb-4"
-            />
+            /> */}
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {t('auth.join_cab_center')}
             </h1>
