@@ -4,7 +4,17 @@ import { Shield, Clock, CreditCard, MapPin, Car, CheckCircle } from 'lucide-reac
 import { useTranslation } from '../../../lib/i18n';
 
 export default function FeaturesSection() {
-  const { t } = useTranslation();
+  const { t, isInitialized } = useTranslation();
+  
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return <div className="bg-white py-16 lg:py-20" />; // Loading state
+  }
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return <div className="bg-white py-16 lg:py-20" />; // Loading state
+  }
+  
   const features = [
     {
       icon: Shield,

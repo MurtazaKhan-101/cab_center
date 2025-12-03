@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { Button, Input, Alert, Spinner, Divider } from "../ui";
 import { ROUTES, API_BASE_URL } from "../../lib/constants";
+import { useTranslation } from "../../../lib/i18n";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Signup() {
+  const { t, isInitialized } = useTranslation();
   const router = useRouter();
   const { register } = useAuth();
 
@@ -22,6 +24,15 @@ export default function Signup() {
   const [alert, setAlert] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -34,23 +45,23 @@ export default function Signup() {
     const newErrors = {};
 
     if (!formData.firstName.trim()) {
-      newErrors.firstName = "First name is required";
+      newErrors.firstName = t('errors.first_name_required');
     }
 
     if (!formData.lastName.trim()) {
-      newErrors.lastName = "Last name is required";
+      newErrors.lastName = t('errors.last_name_required');
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = t('errors.email_required');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+      newErrors.email = t('errors.email_invalid');
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = t('errors.password_required');
     } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+      newErrors.password = t('errors.password_min_length');
     }
 
     setErrors(newErrors);
@@ -76,7 +87,7 @@ export default function Signup() {
       );
 
       if (result.success) {
-        setAlert({ type: "success", message: result.message });
+        setAlert({ type: "success", message: t('success.registration_success') });
         // Redirect to OTP verification page
         setTimeout(() => {
           window.location.href = `${
@@ -86,13 +97,13 @@ export default function Signup() {
       } else {
         setAlert({
           type: "error",
-          message: result.message || "Registration failed",
+          message: result.message || t('errors.registration_failed'),
         });
       }
     } catch (error) {
       setAlert({
         type: "error",
-        message: error.message || "An error occurred",
+        message: error.message || t('errors.generic_error'),
       });
     } finally {
       setLoading(false);
@@ -111,35 +122,35 @@ export default function Signup() {
           <div className="mb-8">
             <img
               src="/images/logo.svg"
-              alt="Cab Center"
+              alt={t('auth.logo_alt')}
               className="mx-auto mb-6"
               width={120}
               height={120}
             />
 
           </div>
-          <h1 className="text-4xl font-bold mb-4">Welcome to Cab Center</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('auth.welcome_cab_center')}</h1>
           <p className="text-xl opacity-90 mb-8">
-            Join thousands of riders who trust us for their transportation needs
+            {t('auth.join_thousands')}
           </p>
           <div className="flex justify-center gap-4 mb-8">
             <img
               src="/images/sedan.svg"
-              alt="Sedan"
+              alt={t('auth.sedan_alt')}
               width={76}
               height={76}
              
             />
             <img
               src="/images/suv.svg"
-              alt="SUV"
+              alt={t('auth.suv_alt')}
              width={76}
              height={76}
   
             />
             <img
               src="/images/mini van.svg"
-              alt="Mini Van"
+              alt={t('auth.hiace_alt')}
               width={76}
               height={76}
           
@@ -156,26 +167,26 @@ export default function Signup() {
           <div className="lg:hidden text-center mb-8">
             <Image
               src="/images/logo.svg"
-              alt="Cab Center Logo"
+              alt={t('auth.logo_alt')}
               width={80}
               height={80}
               className="mx-auto mb-4"
             />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Join Cab Center
+              {t('auth.join_cab_center')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Create your account to get started
+              {t('auth.create_account_mobile')}
             </p>
           </div>
 
           {/* Desktop Header */}
           <div className="hidden lg:block mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Create Account
+              {t('auth.create_account_desktop')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Sign up to start booking your rides
+              {t('auth.sign_up_subtitle')}
             </p>
           </div>
 
@@ -204,7 +215,7 @@ export default function Signup() {
                   <Input
                     type="text"
                     name="firstName"
-                    placeholder="First Name"
+                    placeholder={t('auth.first_name_placeholder')}
                     value={formData.firstName}
                     onChange={handleChange}
                     disabled={loading}
@@ -222,7 +233,7 @@ export default function Signup() {
                   <Input
                     type="text"
                     name="lastName"
-                    placeholder="Last Name"
+                    placeholder={t('auth.last_name_placeholder')}
                     value={formData.lastName}
                     onChange={handleChange}
                     disabled={loading}
@@ -242,7 +253,7 @@ export default function Signup() {
                 <Input
                   type="email"
                   name="email"
-                  placeholder="Email Address"
+                  placeholder={t('auth.email_placeholder')}
                   value={formData.email}
                   onChange={handleChange}
                   disabled={loading}
@@ -261,7 +272,7 @@ export default function Signup() {
                 <Input
                   type="password"
                   name="password"
-                  placeholder="Password (min. 8 characters)"
+                  placeholder={t('auth.password_min_placeholder')}
                   value={formData.password}
                   onChange={handleChange}
                   disabled={loading}
@@ -279,10 +290,10 @@ export default function Signup() {
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <Spinner size="sm" className="mr-2" />
-                    Creating Account...
+                    {t('auth.creating_account')}
                   </div>
                 ) : (
-                  "Create Account"
+                  t('auth.create_account_button')
                 )}
               </button>
             </form>
@@ -291,7 +302,7 @@ export default function Signup() {
             <div className="flex items-center my-6">
               <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
               <span className="px-4 text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800">
-                OR
+                {t('auth.or')}
               </span>
               <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
             </div>
@@ -321,7 +332,7 @@ export default function Signup() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Continue with Google
+                {t('auth.continue_with_google')}
               </div>
             </button>
           </div>
@@ -329,26 +340,26 @@ export default function Signup() {
           {/* Login Link */}
           <div className="mt-8 text-center">
             <span className="text-gray-600 dark:text-gray-400">
-              Already have an account?{" "}
+              {t('auth.already_have_account')}{" "}
             </span>
             <Link
               href={ROUTES.LOGIN}
               className="text-[#00188F] hover:text-[#000729] font-semibold hover:underline transition-colors duration-200"
             >
-              Sign In
+              {t('auth.sign_in_link')}
             </Link>
           </div>
 
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-              By creating an account, you agree to our{" "}
+              {t('auth.terms_agreement_signup')}{" "}
               <Link href="#" className="text-[#00188F] hover:underline">
-                Terms of Service
+                {t('auth.terms_of_service')}
               </Link>{" "}
-              and{" "}
+              {t('auth.and')}{" "}
               <Link href="#" className="text-[#00188F] hover:underline">
-                Privacy Policy
+                {t('auth.privacy_policy')}
               </Link>
             </p>
           </div>

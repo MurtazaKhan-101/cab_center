@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { Button, Input, Alert, Spinner } from "../ui";
 import { ROUTES } from "../../lib/constants";
+import { useTranslation } from "../../../lib/i18n";
 
 export default function ResetPassword() {
+  const { t, isInitialized } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { resetPassword } = useAuth();
@@ -20,6 +22,15 @@ export default function ResetPassword() {
   const [errors, setErrors] = useState({});
   const [alert, setAlert] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     const emailParam = searchParams.get("email");
@@ -45,17 +56,17 @@ export default function ResetPassword() {
     const newErrors = {};
 
     if (!formData.newPassword) {
-      newErrors.newPassword = "Password is required";
+      newErrors.newPassword = t('errors.password_required');
     } else if (formData.newPassword.length < 8) {
-      newErrors.newPassword = "Password must be at least 8 characters";
+      newErrors.newPassword = t('errors.password_min_length');
     } else if (/\s/.test(formData.newPassword)) {
-      newErrors.newPassword = "Password cannot contain spaces";
+      newErrors.newPassword = t('errors.password_no_spaces');
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
+      newErrors.confirmPassword = t('errors.confirm_password_required');
     } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = t('errors.passwords_no_match');
     }
 
     setErrors(newErrors);
@@ -78,7 +89,7 @@ export default function ResetPassword() {
       if (result.success) {
         setAlert({
           type: "success",
-          message: "Password reset successful! Redirecting to login...",
+          message: t('success.password_reset_success'),
         });
         setTimeout(() => {
           window.location.href = ROUTES.LOGIN;
@@ -86,13 +97,13 @@ export default function ResetPassword() {
       } else {
         setAlert({
           type: "error",
-          message: result.message || "Failed to reset password",
+          message: result.message || t('errors.password_reset_failed'),
         });
       }
     } catch (error) {
       setAlert({
         type: "error",
-        message: error.message || "An error occurred",
+        message: error.message || t('errors.generic_error'),
       });
     } finally {
       setLoading(false);
@@ -111,7 +122,7 @@ export default function ResetPassword() {
 
       <div className="mb-6">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Create a new password for <strong>{email}</strong>
+          {t('auth.create_new_password_for')} <strong>{email}</strong>
         </p>
       </div>
 
@@ -119,7 +130,7 @@ export default function ResetPassword() {
         <Input
           type="password"
           name="newPassword"
-          placeholder="New Password"
+          placeholder={t('auth.new_password_placeholder')}
           value={formData.newPassword}
           onChange={handleChange}
           error={errors.newPassword}
@@ -129,7 +140,7 @@ export default function ResetPassword() {
         <Input
           type="password"
           name="confirmPassword"
-          placeholder="Confirm Password"
+          placeholder={t('auth.confirm_password_placeholder')}
           value={formData.confirmPassword}
           onChange={handleChange}
           error={errors.confirmPassword}
@@ -137,10 +148,10 @@ export default function ResetPassword() {
         />
 
         <div className="text-xs text-gray-500 dark:text-gray-400">
-          <p>Password must:</p>
+          <p>{t('auth.password_requirements')}:</p>
           <ul className="list-disc list-inside mt-1 space-y-1">
-            <li>Be at least 8 characters long</li>
-            <li>Not contain spaces</li>
+            <li>{t('auth.password_min_characters')}</li>
+            <li>{t('auth.password_no_spaces')}</li>
           </ul>
         </div>
 
@@ -148,7 +159,7 @@ export default function ResetPassword() {
           {loading ? (
             <Spinner size="sm" className="mx-auto" />
           ) : (
-            "Reset Password"
+            t('auth.reset_password_button')
           )}
         </Button>
       </form>

@@ -65,6 +65,35 @@
       display: block;
     }
   }
+  .xs\:inline {
+    @media (min-width: 475px) {
+      display: inline;
+    }
+  }
+  .xs\:hidden {
+    @media (max-width: 474px) {
+      display: none;
+    }
+  }
+  
+  /* Extra small screen utilities */
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  
+  /* Ensure buttons don't break on very small screens */
+  .whitespace-nowrap {
+    white-space: nowrap;
+  }
+  
+  /* Mobile-first responsive spacing */
+  @media (max-width: 639px) {
+    .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+      margin-right: 0.5rem;
+      margin-left: 0.5rem;
+    }
+  }
   .bg-sidebar-gradient {
     background: var(--gradient-sidebar);
   }

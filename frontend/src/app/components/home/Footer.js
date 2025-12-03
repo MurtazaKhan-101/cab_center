@@ -4,7 +4,17 @@ import Image from 'next/image';
 import { useTranslation } from '../../../lib/i18n';
 
 export default function Footer() {
-  const { t } = useTranslation();
+  const { t, isInitialized } = useTranslation();
+  
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return <footer className="bg-ui-cards-gradient text-white py-12" />; // Loading state
+  }
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return <footer className="bg-ui-cards-gradient text-white py-12" />; // Loading state
+  }
+  
   const handleSmoothScroll = (e, targetId) => {
     e.preventDefault();
     const element = document.getElementById(targetId);

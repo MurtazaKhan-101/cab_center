@@ -5,8 +5,18 @@ import { Plus, Minus } from 'lucide-react';
 import { useTranslation } from '../../../lib/i18n';
 
 export default function FAQSection() {
-  const { t } = useTranslation();
+  const { t, isInitialized } = useTranslation();
   const [openItem, setOpenItem] = useState(null);
+
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return <section className="bg-ui-cards-gradient py-20" />; // Loading state
+  }
+
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return <section className="bg-ui-cards-gradient py-20" />; // Loading state
+  }
 
   const faqs = [
     {

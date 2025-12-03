@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { Button, Input, Alert, Spinner } from "../ui";
 import { ROUTES } from "../../lib/constants";
+import { useTranslation } from "../../../lib/i18n";
 
 export default function VerifyOtp() {
+  const { t, isInitialized } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { verifyOTP, resendOTP } = useAuth();
@@ -18,6 +20,15 @@ export default function VerifyOtp() {
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
+
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     const emailParam = searchParams.get("email");
@@ -41,12 +52,12 @@ export default function VerifyOtp() {
     setError("");
 
     if (!otp.trim()) {
-      setError("OTP is required");
+      setError(t('errors.otp_required'));
       return;
     }
 
     if (otp.length !== 4) {
-      setError("OTP must be 4 digits");
+      setError(t('errors.otp_four_digits'));
       return;
     }
 
@@ -58,18 +69,18 @@ export default function VerifyOtp() {
       if (result.success) {
         setAlert({
           type: "success",
-          message: "Email verified! Redirecting...",
+          message: t('success.email_verified'),
         });
         setTimeout(() => {
           window.location.href = ROUTES.DASHBOARD;
         }, 1500);
       } else {
-        setAlert({ type: "error", message: result.message || "Invalid OTP" });
+        setAlert({ type: "error", message: result.message || t('errors.invalid_otp') });
       }
     } catch (error) {
       setAlert({
         type: "error",
-        message: error.message || "Verification failed",
+        message: error.message || t('errors.verification_failed'),
       });
     } finally {
       setLoading(false);
@@ -84,18 +95,18 @@ export default function VerifyOtp() {
       const result = await resendOTP(email);
 
       if (result.success) {
-        setAlert({ type: "success", message: "OTP sent successfully!" });
+        setAlert({ type: "success", message: t('success.otp_sent') });
         setCountdown(60); // Start 60 second countdown
       } else {
         setAlert({
           type: "error",
-          message: result.message || "Failed to resend OTP",
+          message: result.message || t('errors.resend_otp_failed'),
         });
       }
     } catch (error) {
       setAlert({
         type: "error",
-        message: error.message || "Failed to resend OTP",
+        message: error.message || t('errors.resend_otp_failed'),
       });
     } finally {
       setResending(false);
@@ -114,14 +125,14 @@ export default function VerifyOtp() {
 
       <div className="mb-6">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          We've sent a verification code to <strong>{email}</strong>
+          {t('auth.verification_code_sent')} <strong>{email}</strong>
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           type="text"
-          placeholder="Enter 4-digit OTP"
+          placeholder={t('auth.enter_otp_placeholder')}
           value={otp}
           onChange={(e) => {
             const value = e.target.value.replace(/\D/g, "").slice(0, 4);
@@ -135,13 +146,13 @@ export default function VerifyOtp() {
         />
 
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
-          {loading ? <Spinner size="sm" className="mx-auto" /> : "Verify Email"}
+          {loading ? <Spinner size="sm" className="mx-auto" /> : t('auth.verify_email')}
         </Button>
       </form>
 
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-          Didn't receive the code?
+          {t('auth.didnt_receive_code')}
         </p>
         <button
           onClick={handleResendOTP}
@@ -149,10 +160,10 @@ export default function VerifyOtp() {
           className="text-sm text-[#0079D3] hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {resending
-            ? "Sending..."
+            ? t('auth.sending')
             : countdown > 0
-            ? `Resend in ${countdown}s`
-            : "Resend OTP"}
+            ? t('auth.resend_in_seconds', { seconds: countdown })
+            : t('auth.resend_otp')}
         </button>
       </div>
     </div>
