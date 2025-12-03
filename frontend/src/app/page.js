@@ -11,9 +11,9 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Only redirect after loading is complete
+    // If not authenticated, redirect to home route
     if (!loading && !isAuthenticated) {
-      router.push('/auth/login');
+      router.push('/home');
     }
   }, [isAuthenticated, loading, router]);
 
@@ -29,10 +29,11 @@ export default function HomePage() {
     );
   }
 
-  // Don't render content if not authenticated (will redirect)
+  // If not authenticated, will redirect to /home (don't render anything)
   if (!isAuthenticated) {
     return null;
   }
 
+  // If authenticated, show booking interface
   return <BookingInterface />;
 }

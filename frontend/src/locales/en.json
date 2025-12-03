@@ -91,7 +91,7 @@
   "vehicles": {
     "sedan": "Sedan",
     "suv": "SUV",
-    "mini_van": "Mini Van"
+    "mini van": "Mini Van"
   },
   "validation": {
     "pickup_required": "Pickup location is required",
@@ -216,5 +216,49 @@
     "reset_code_sent": "Reset code sent successfully!",
     "otp_sent": "OTP sent successfully!",
     "password_reset_success": "Password reset successful! Redirecting to login..."
+  },
+  "herosection": {
+    "cab_center": "CabCenter",
+    "login": "Login",
+    "signup": "Signup",
+    "hero_title": "Arrive Comfortably, Every Time",
+    "hero_description": "Experience a smarter way to travel. From quick city trips to long-distance journeys, we provide safe, reliable, and comfortable rides  anytime you need them.",
+    "book_now": "Book Now",
+    "hero_background": "Hero Background",
+    "hero_image_alt": "Professional Middle Eastern businessman using laptop - CabCenter reliable service"
+  },
+  "feature_section": {
+    "reliable_service_title": "Reliable, On-Time Service",
+    "reliable_service_desc": "Your driver arrives exactly when you expect. No delays. No stress.",
+    "transparent_pricing_title": "Transparent Pricing",
+    "transparent_pricing_desc": "No hidden fees. No surprises. Just fair, upfront costs.",
+    "available_24_7_title": "Available 24/7",
+    "available_24_7_desc": "Day or night, we're always ready to take you where you need to go.",
+    "enter_pickup_title": "Enter Your Pickup Details",
+    "enter_pickup_desc": "Tell us where you want to go",
+    "choose_ride_title": "Choose Your Ride",
+    "choose_ride_desc": "Select the car that best fits your comfort and budget needs",
+    "confirm_enjoy_title": "Confirm & Enjoy",
+    "confirm_enjoy_desc": "Get instant confirmation and track your trip with ease",
+    "why_ride_with_us": "Why Ride With Us?",
+    "journey_steps": "Your Journey in Three Simple Steps"
+  },
+  "faq": {
+    "top_questions": "Top questions",
+    "how_to_book_question": "How do I book a ride?",
+    "how_to_book_answer": "Simply enter your pickup and drop-off locations, select your preferred vehicle type, choose your date and time, then confirm your booking. You'll receive instant confirmation with driver details.",
+    "drivers_verified_question": "Are your drivers verified?",
+    "drivers_verified_answer": "Yes, all our drivers undergo thorough background checks, vehicle inspections, and regular training. We ensure the highest safety standards for our passengers.",
+    "pricing_question": "How does pricing work?",
+    "pricing_answer": "Our pricing is transparent with no hidden fees. The fare is calculated based on distance, time, and vehicle type. You'll see the exact price before confirming your booking."
+  },
+
+  "footer": {
+    "cab_center": "CabCenter",
+    "home": "Home",
+    "faq": "FAQ",
+    "why_us": "Why us?",
+    "how_to_book": "How to Book",
+    "copyright": "All rights reserved. Cab Centre © 2025"
   }
 }

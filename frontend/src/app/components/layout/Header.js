@@ -226,16 +226,14 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <Image
+              {/* <Image
                 src="/images/logo.svg"
                 alt="Cab Centre Logo"
                 width={40}
                 height={40}
                 className="h-10 w-auto"
-              />
-              <span className="ml-3 text-xl font-bold text-white hidden sm:block">
-                Cab Centre
-              </span>
+              /> */}
+              <h1 className="text-white font-bold text-2xl">{t('herosection.cab_center')}</h1>
             </Link>
           </div>
 

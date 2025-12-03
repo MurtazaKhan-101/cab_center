@@ -138,8 +138,8 @@ export default function Signup() {
   
             />
             <img
-              src="/images/hiace.svg"
-              alt="Hiace"
+              src="/images/mini van.svg"
+              alt="Mini Van"
               width={76}
               height={76}
           

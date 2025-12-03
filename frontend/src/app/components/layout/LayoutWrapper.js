@@ -7,7 +7,7 @@ import { useMemo } from "react";
 
 const LayoutWrapper = ({ children }) => {
   const pathname = usePathname();
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, isAuthenticated } = useAuth();
 
   // Routes where header should not appear
   const noHeaderRoutes = useMemo(() => [
@@ -20,11 +20,21 @@ const LayoutWrapper = ({ children }) => {
     "/auth/oauth-success"
   ], []);
 
-  // Check if current route should show header - show immediately for non-auth routes
-  const shouldShowHeader = useMemo(() => 
-    !noHeaderRoutes.includes(pathname), 
-    [pathname, noHeaderRoutes]
-  );
+  // Check if current route should show header
+  const shouldShowHeader = useMemo(() => {
+    // Don't show header on auth routes
+    if (noHeaderRoutes.includes(pathname)) {
+      return false;
+    }
+    
+    // Don't show header on homepage if user is not authenticated
+    if (pathname === "/" && !isAuthenticated) {
+      return false;
+    }
+    
+    // Show header for all other cases (authenticated users on any route)
+    return isAuthenticated;
+  }, [pathname, noHeaderRoutes, isAuthenticated]);
 
   return (
     <>

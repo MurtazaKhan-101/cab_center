@@ -19,7 +19,7 @@ export const Button = ({
       "bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800",
     google:
       "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700",
-    auth: "bg-auth-btn-bg text-white hover:bg-buttons-gradient transition-all duration-200 shadow-md hover:shadow-lg",
+    auth: "bg-primary text-white hover:bg-buttons-gradient transition-all duration-200 shadow-md hover:shadow-lg",
   };
 
   return (

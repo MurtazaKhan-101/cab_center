@@ -10,7 +10,7 @@ export const AuthLayout = ({ children, title, subtitle }) => {
         {/* Reddit-style logo/branding */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-auth-btn-bg">Cab Centre</h1>
+            <h1 className="text-3xl font-bold text-primary">Cab Centre</h1>
           </Link>
         </div>
 

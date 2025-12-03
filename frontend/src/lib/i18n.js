@@ -3,8 +3,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
 // Import translations
-import enTranslations from '../locales/en.json';
-import arTranslations from '../locales/ar.json';
+const enTranslations = require('../locales/en.json');
+const arTranslations = require('../locales/ar.json');
 
 const translations = {
   en: enTranslations,

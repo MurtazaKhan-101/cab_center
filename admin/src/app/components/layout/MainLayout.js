@@ -30,7 +30,7 @@ const MainLayout = ({ children }) => {
        <Header
         onMenuClick={() => setSidebarOpen(true)}
         title="Admin Dashboard"
-        className="text-auth-btn-bg"
+        className="text-primary"
         />
       
 
