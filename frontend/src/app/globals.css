@@ -5,13 +5,13 @@
   --color-foreground: #111827;
 
   --gradient-sidebar: linear-gradient(90deg, #00188F 0%, #000729 100%);
-  --gradient-trending: linear-gradient(90deg, #00188F 0%, #000729 100%);
   --gradient-buttons: linear-gradient(90deg, #00188F 0%, #000729 100%);
   --gradient-chat: linear-gradient(180deg, #00188F 0%, #000729 100%);
   --gradient-buttons-hover: linear-gradient(90deg, #000729 0%, #00188F 100%);
   --gradient-ui-cards: linear-gradient(90deg, #00188F 0%, #000729 100%);
 
   --color-auth-btn-bg: #00188F;
+  --color-primary: #00188F;
   --color-secondary: #5C88D7;
 }
 
@@ -65,6 +65,35 @@
       display: block;
     }
   }
+  .xs\:inline {
+    @media (min-width: 475px) {
+      display: inline;
+    }
+  }
+  .xs\:hidden {
+    @media (max-width: 474px) {
+      display: none;
+    }
+  }
+  
+  /* Extra small screen utilities */
+  .text-xs {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+  
+  /* Ensure buttons don't break on very small screens */
+  .whitespace-nowrap {
+    white-space: nowrap;
+  }
+  
+  /* Mobile-first responsive spacing */
+  @media (max-width: 639px) {
+    .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+      margin-right: 0.5rem;
+      margin-left: 0.5rem;
+    }
+  }
   .bg-sidebar-gradient {
     background: var(--gradient-sidebar);
   }
@@ -75,9 +104,7 @@
   .bg-gradient-sidebar {
     background: var(--gradient-sidebar);
   }
-  .bg-trending-gradient {
-    background: var(--gradient-trending);
-  }
+ 
   .bg-buttons-gradient {
     background: var(--gradient-buttons);
   }
@@ -106,6 +133,27 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
+  }
+  .text-primary {
+    color: var(--color-primary);
+  }
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+  .text-secondary {
+    color: var(--color-secondary);
+  }
+  .text-primary-foreground {
+    color: #ffffff;
+  }
+  .text-muted {
+    color: #6b7280;
+  }
+  .text-muted-foreground {
+    color: #374151;
+  }
+  .text-accent {
+    color: #dbeafe;
   }
   .stroke-buttons-gradient {
     stroke: url(#buttons-gradient);

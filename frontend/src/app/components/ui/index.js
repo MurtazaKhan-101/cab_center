@@ -67,8 +67,8 @@ export const Input = ({
         className={`w-full px-4 py-3 rounded-lg border-2 ${
           error
             ? "border-red-500 focus:border-red-500"
-            : "border-gray-300 dark:border-gray-600 focus:border-auth-btn-bg"
-        } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1.5 focus:ring-auth-btn-bg/30 transition-all ${className}`}
+            : "border-gray-300 dark:border-gray-600 focus:border-primary"
+        } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1.5 focus:ring-primary/30 transition-all ${className}`}
         {...props}
       />
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}

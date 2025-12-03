@@ -70,10 +70,10 @@ export default function BookingInterface() {
         },
         {
           id: "mini van",
-          name: t("vehicles.mini_van"),
+          name: t("vehicles.mini van"),
           price: t("booking_form.price_per_km", { price: "150" }),
           farePerKm: 150,
-          image: "/images/hiace.svg",
+          image: "/images/mini van.svg",
           seats: 4,
           capacity: t("booking_form.vehicle_capacity", { seats: "4" }),
         },
@@ -444,7 +444,7 @@ export default function BookingInterface() {
               <div className="absolute inset-4 flex flex-col justify-between">
                 {/* Destination */}
                 <div className="flex items-center gap-3 justify-end">
-                  <div className="w-6 h-6 bg-auth-btn-bg rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                     <MapPin className="w-4 h-4 text-white" />
                   </div>
                 </div>
@@ -480,7 +480,7 @@ export default function BookingInterface() {
                     <MapPin
                       className={`absolute ${
                         isRTL() ? "right-3" : "left-3"
-                      } top-4 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`}
+                      } top-4 w-4 h-4 sm:w-5 sm:h-5 text-primary`}
                     />
                     <Input
                       type="text"
@@ -502,7 +502,7 @@ export default function BookingInterface() {
                     <MapPin
                       className={`absolute ${
                         isRTL() ? "right-3" : "left-3"
-                      } top-4 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`}
+                      } top-4 w-4 h-4 sm:w-5 sm:h-5 text-primary`}
                     />
                     <Input
                       type="text"
@@ -543,7 +543,7 @@ export default function BookingInterface() {
                     <Calendar
                       className={`absolute ${
                         isRTL() ? "right-3" : "left-3"
-                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`}
+                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-primary`}
                     />
                     <Input
                       type="date"
@@ -564,7 +564,7 @@ export default function BookingInterface() {
                     <Clock
                       className={`absolute ${
                         isRTL() ? "right-3" : "left-3"
-                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`}
+                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-primary`}
                     />
                     <Input
                       type="time"
@@ -588,7 +588,7 @@ export default function BookingInterface() {
                     <User
                       className={`absolute ${
                         isRTL() ? "right-3" : "left-3"
-                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`}
+                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-primary`}
                     />
                     <Input
                       type="text"
@@ -610,7 +610,7 @@ export default function BookingInterface() {
                     <Phone
                       className={`absolute ${
                         isRTL() ? "right-3" : "left-3"
-                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`}
+                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-primary`}
                     />
                     <Input
                       type="tel"
@@ -635,7 +635,7 @@ export default function BookingInterface() {
                     <Mail
                       className={`absolute ${
                         isRTL() ? "right-3" : "left-3"
-                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`}
+                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-primary`}
                     />
                     <Input
                       type="email"
@@ -656,7 +656,7 @@ export default function BookingInterface() {
                     <Users
                       className={`absolute ${
                         isRTL() ? "right-3" : "left-3"
-                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg`}
+                      } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-primary`}
                     />
                     <Input
                       type="text"
@@ -683,7 +683,7 @@ export default function BookingInterface() {
                   <MessageSquare
                     className={`absolute ${
                       isRTL() ? "right-3" : "left-3"
-                    } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-auth-btn-bg z-10`}
+                    } top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-primary z-10`}
                   />
                   <textarea
                     name="specialRequirements"
@@ -694,7 +694,7 @@ export default function BookingInterface() {
                     maxLength={500}
                     className={`w-full px-4 py-3 ${
                       isRTL() ? "pr-10" : "pl-10"
-                    } rounded-lg border-2 border-gray-300 dark:border-gray-600 focus:border-auth-btn-bg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-auth-btn-bg/30 transition-all resize-none text-sm`}
+                    } rounded-lg border-2 border-gray-300 dark:border-gray-600 focus:border-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all resize-none text-sm`}
                   />
                   {errors.specialRequirements && (
                     <p className="mt-1 text-sm text-red-500">
@@ -714,9 +714,9 @@ export default function BookingInterface() {
                     <div
                       key={vehicle.id}
                       onClick={() => handleVehicleSelect(vehicle.id)}
-                      className={`group relative cursor-pointer rounded-lg p-2 border-2 transition-all duration-200 hover:border-auth-btn-bg ${
+                      className={`group relative cursor-pointer rounded-lg p-2 border-2 transition-all duration-200 hover:border-primary ${
                         formData.selectedVehicle === vehicle.id
-                          ? "border-auth-btn-bg bg-buttons-gradient"
+                          ? "border-primary bg-buttons-gradient"
                           : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800"
                       }`}
                     >
@@ -730,7 +730,7 @@ export default function BookingInterface() {
                             className="object-contain"
                           />
                           {/* Seat count badge */}
-                          <div className="absolute -top-1 -right-1 bg-auth-btn-bg text-white dark:text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                          <div className="absolute -top-1 -right-1 bg-primary text-white dark:text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                             {vehicle.seats}
                           </div>
                         </div>
@@ -768,10 +768,10 @@ export default function BookingInterface() {
 
                 {/* Selected vehicle info */}
                 {formData.selectedVehicle && (
-                  <div className="mt-3 p-2 bg-auth-btn-bg/5 border border-auth-btn-bg/20 rounded-lg">
+                  <div className="mt-3 p-2 bg-primary/5 border border-primary/20 rounded-lg">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-auth-btn-bg rounded-full flex-shrink-0"></div>
-                      <span className="text-xs font-medium text-auth-btn-bg dark:text-gray-300">
+                      <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                      <span className="text-xs font-medium text-primary dark:text-gray-300">
                         {
                           vehicles.find(
                             (v) => v.id === formData.selectedVehicle

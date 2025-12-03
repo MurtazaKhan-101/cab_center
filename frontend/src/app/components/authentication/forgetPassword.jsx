@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { Button, Input, Alert, Spinner } from "../ui";
 import { ROUTES } from "../../lib/constants";
+import { useTranslation } from "../../../lib/i18n";
 import Link from "next/link";
 
 export default function ForgetPassword() {
+  const { t, isInitialized } = useTranslation();
   const router = useRouter();
   const { forgotPassword } = useAuth();
 
@@ -16,13 +18,22 @@ export default function ForgetPassword() {
   const [alert, setAlert] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Prevent content flash during initialization
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   const validateEmail = () => {
     if (!email.trim()) {
-      setError("Email is required");
+      setError(t('errors.email_required'));
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      setError("Email is invalid");
+      setError(t('errors.email_invalid'));
       return false;
     }
     return true;
@@ -43,7 +54,7 @@ export default function ForgetPassword() {
       const result = await forgotPassword(email);
 
       if (result.success) {
-        setAlert({ type: "success", message: result.message });
+        setAlert({ type: "success", message: t('success.reset_code_sent') });
         setTimeout(() => {
           window.location.href = `${
             ROUTES.VERIFY_RESET_OTP
@@ -52,13 +63,13 @@ export default function ForgetPassword() {
       } else {
         setAlert({
           type: "error",
-          message: result.message || "Failed to send reset code",
+          message: result.message || t('errors.reset_code_failed'),
         });
       }
     } catch (error) {
       setAlert({
         type: "error",
-        message: error.message || "An error occurred",
+        message: error.message || t('errors.generic_error'),
       });
     } finally {
       setLoading(false);
@@ -77,15 +88,14 @@ export default function ForgetPassword() {
 
       <div className="mb-6">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Enter your email address and we'll send you a code to reset your
-          password.
+          {t('auth.forgot_password_description')}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           type="email"
-          placeholder="Email"
+          placeholder={t('auth.email_placeholder')}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -99,7 +109,7 @@ export default function ForgetPassword() {
           {loading ? (
             <Spinner size="sm" className="mx-auto" />
           ) : (
-            "Send Reset Code"
+            t('auth.send_reset_code')
           )}
         </Button>
       </form>
@@ -109,7 +119,7 @@ export default function ForgetPassword() {
           href={ROUTES.LOGIN}
           className="text-sm text-[#0079D3] hover:underline"
         >
-          Back to Log In
+          {t('auth.back_to_login')}
         </Link>
       </div>
     </div>

@@ -33,7 +33,7 @@ const Header = ({ onMenuClick, title = "Dashboard" }) => {
             <Menu className="w-6 h-6" />
           </button>
           
-          <h1 className="text-lg font-semibold  text-auth-btn-bg dark:text-white truncate">
+          <h1 className="text-lg font-semibold  text-primary dark:text-white truncate">
             {title}
           </h1>
           

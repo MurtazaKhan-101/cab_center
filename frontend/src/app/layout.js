@@ -18,10 +18,21 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" dir="ltr">
+    <html lang="ar" dir="rtl">
       <head>
         <title>Cab Centre - Your Ride, Your Way</title>
         <meta name="description" content="Premium cab booking service" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const savedLang = localStorage.getItem('language') || 'ar';
+                document.documentElement.lang = savedLang;
+                document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
+              })();
+            `
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

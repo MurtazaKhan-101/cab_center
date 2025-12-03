@@ -3,14 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "../../../lib/i18n";
 import { Button, Input, Alert, Spinner, Divider } from "../ui";
 import { ROUTES, API_BASE_URL } from "../../lib/constants";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function Login() {
+export default function LoginWithI18n() {
   const router = useRouter();
   const { login } = useAuth();
+  const { t, isRTL } = useTranslation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -33,13 +35,13 @@ export default function Login() {
     const newErrors = {};
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = t('errors.email_required');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+      newErrors.email = t('errors.email_invalid');
     }
 
     if (!formData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = t('errors.password_required');
     }
 
     setErrors(newErrors);
@@ -62,18 +64,21 @@ export default function Login() {
       if (result.success) {
         setAlert({
           type: "success",
-          message: "Login successful! Redirecting...",
+          message: t('success.login_success'),
         });
         setTimeout(() => {
           window.location.href = ROUTES.DASHBOARD;
         }, 1000);
       } else {
-        setAlert({ type: "error", message: result.message || "Login failed" });
+        setAlert({ 
+          type: "error", 
+          message: result.message || t('errors.login_failed') 
+        });
       }
     } catch (error) {
       setAlert({
         type: "error",
-        message: error.message || "An error occurred",
+        message: error.message || t('errors.generic_error'),
       });
     } finally {
       setLoading(false);
@@ -85,30 +90,29 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col lg:flex-row">
+    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col lg:flex-row ${isRTL() ? 'rtl' : 'ltr'}`}>
       {/* Left Side - Hero Section with Image */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#00188F] to-[#000729] items-center justify-center p-12">
         <div className="text-center text-white max-w-md">
           <div className="mb-8">
-            <img
+            {/* <img
               src="/images/logo.svg"
-              alt="Cab Center"
+              alt={t('auth.logo_alt')}
               className="mx-auto mb-6"
               width={120}
               height={120}
-            />
+            /> */}
           </div>
-          <h1 className="text-4xl font-bold mb-4">Welcome Back</h1>
+          <h1 className="text-4xl font-bold mb-4">{t('auth.welcome_back')}</h1>
           <p className="text-xl opacity-90 mb-8">
-            Sign in to access your account and book your next ride
+            {t('auth.sign_in_subtitle')}
           </p>
-          <div className="flex justify-center gap-4 mb-8"></div>
           <div className="flex justify-center gap-4 mb-8 ">
-            <img src="/images/sedan.svg" alt="Sedan" width={76} height={76} />
-            <img src="/images/suv.svg " alt="SUV" width={76} height={76} />
+            <img src="/images/sedan.svg" alt={t('auth.sedan_alt')} width={76} height={76} />
+            <img src="/images/suv.svg " alt={t('auth.suv_alt')} width={76} height={76} />
             <img
               src="/images/mini van.svg"
-              alt="Hiace"
+              alt={t('auth.hiace_alt')}
               width={76}
               height={76}
             />
@@ -121,28 +125,30 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Mobile Header */}
           <div className="lg:hidden text-center mb-8">
-            <Image
+            
+            {/* <Image
               src="/images/logo.svg"
-              alt="Cab Center Logo"
+              alt={t('auth.logo_alt')}
               width={80}
               height={80}
               className="mx-auto mb-4"
-            />
+            /> */}
+            
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Welcome Back
+              {t('auth.welcome_back')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Sign in to your account
+              {t('auth.sign_in_title')}
             </p>
           </div>
 
           {/* Desktop Header */}
           <div className="hidden lg:block mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Sign In
+              {t('auth.sign_in_title')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Welcome back! Please sign in to continue
+              {t('auth.sign_in_continue')}
             </p>
           </div>
 
@@ -162,7 +168,7 @@ export default function Login() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Email Field */}
               <div className="relative">
-                <div className="absolute left-3 top-3 pointer-events-none z-10">
+                <div className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3 pointer-events-none z-10`}>
                   <svg
                     className="h-5 w-5 text-gray-400"
                     fill="none"
@@ -180,18 +186,18 @@ export default function Login() {
                 <Input
                   type="email"
                   name="email"
-                  placeholder="Email Address"
+                  placeholder={t('auth.email_placeholder')}
                   value={formData.email}
                   onChange={handleChange}
                   disabled={loading}
                   error={errors.email}
-                  className="pl-10"
+                  className={isRTL() ? 'pr-10' : 'pl-10'}
                 />
               </div>
 
               {/* Password Field */}
               <div className="relative">
-                <div className="absolute left-3 top-3 pointer-events-none z-10">
+                <div className={`absolute ${isRTL() ? 'right-3' : 'left-3'} top-3 pointer-events-none z-10`}>
                   <svg
                     className="h-5 w-5 text-gray-400"
                     fill="none"
@@ -209,12 +215,12 @@ export default function Login() {
                 <Input
                   type="password"
                   name="password"
-                  placeholder="Password"
+                  placeholder={t('auth.password_placeholder')}
                   value={formData.password}
                   onChange={handleChange}
                   disabled={loading}
                   error={errors.password}
-                  className="pl-10"
+                  className={isRTL() ? 'pr-10' : 'pl-10'}
                 />
               </div>
 
@@ -225,15 +231,15 @@ export default function Login() {
                     type="checkbox"
                     className="rounded border-gray-300 text-[#00188F] focus:border-[#00188F] focus:ring-[#00188F]"
                   />
-                  <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                    Remember me
+                  <span className={`${isRTL() ? 'mr-2' : 'ml-2'} text-sm text-gray-600 dark:text-gray-400`}>
+                    {t('auth.remember_me')}
                   </span>
                 </label>
                 <Link
                   href={ROUTES.FORGOT_PASSWORD}
                   className="text-sm text-[#00188F] hover:text-[#000729] font-medium hover:underline transition-colors duration-200"
                 >
-                  Forgot password?
+                  {t('auth.forgot_password')}
                 </Link>
               </div>
 
@@ -246,10 +252,10 @@ export default function Login() {
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <Spinner size="sm" className="mr-2" />
-                    Signing In...
+                    {t('auth.signing_in')}
                   </div>
                 ) : (
-                  "Sign In"
+                  t('auth.sign_in_button')
                 )}
               </button>
             </form>
@@ -258,7 +264,7 @@ export default function Login() {
             <div className="flex items-center my-6">
               <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
               <span className="px-4 text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800">
-                OR
+                {t('auth.or')}
               </span>
               <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
             </div>
@@ -288,7 +294,7 @@ export default function Login() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Continue with Google
+                {t('auth.continue_with_google')}
               </div>
             </button>
           </div>
@@ -296,26 +302,26 @@ export default function Login() {
           {/* Signup Link */}
           <div className="mt-8 text-center">
             <span className="text-gray-600 dark:text-gray-400">
-              Don't have an account?{" "}
+              {t('auth.dont_have_account')}{" "}
             </span>
             <Link
               href={ROUTES.SIGNUP}
               className="text-[#00188F] hover:text-[#000729] font-semibold hover:underline transition-colors duration-200"
             >
-              Sign Up
+              {t('auth.sign_up_link')}
             </Link>
           </div>
 
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-              By signing in, you agree to our{" "}
+              {t('auth.terms_agreement_login')}{" "}
               <Link href="#" className="text-[#00188F] hover:underline">
-                Terms of Service
+                {t('auth.terms_of_service')}
               </Link>{" "}
-              and{" "}
+              {t('auth.and')}{" "}
               <Link href="#" className="text-[#00188F] hover:underline">
-                Privacy Policy
+                {t('auth.privacy_policy')}
               </Link>
             </p>
           </div>

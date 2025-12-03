@@ -3,8 +3,8 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
 // Import translations
-import enTranslations from '../locales/en.json';
-import arTranslations from '../locales/ar.json';
+const enTranslations = require('../locales/en.json');
+const arTranslations = require('../locales/ar.json');
 
 const translations = {
   en: enTranslations,
@@ -21,14 +21,25 @@ const getNestedTranslation = (obj, path) => {
 
 // Language provider component
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState('ar'); // Default to Arabic
+  const [language, setLanguage] = useState('ar'); // Always start with Arabic for SSR
   const [currentTranslations, setCurrentTranslations] = useState(translations.ar);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Load language from localStorage on component mount
+    // Only run on client side
     const savedLanguage = localStorage.getItem('language') || 'ar';
-    setLanguage(savedLanguage);
-    setCurrentTranslations(translations[savedLanguage]);
+    
+    // Update state if different from saved language
+    if (savedLanguage !== language) {
+      setLanguage(savedLanguage);
+      setCurrentTranslations(translations[savedLanguage]);
+    }
+    
+    // Set document attributes
+    document.documentElement.lang = savedLanguage;
+    document.documentElement.dir = savedLanguage === 'ar' ? 'rtl' : 'ltr';
+    
+    setIsInitialized(true);
   }, []);
 
   const changeLanguage = (lang) => {
@@ -69,7 +80,8 @@ export function LanguageProvider({ children }) {
     changeLanguage,
     t,
     isRTL,
-    translations: currentTranslations
+    translations: currentTranslations,
+    isInitialized
   };
 
   return (
@@ -94,6 +106,6 @@ export const supportedLanguages = ['en', 'ar'];
 
 // Helper hook for translation
 export function useTranslation() {
-  const { t, language, isRTL } = useLanguage();
-  return { t, language, isRTL };
+  const { t, language, isRTL, isInitialized } = useLanguage();
+  return { t, language, isRTL, isInitialized };
 }

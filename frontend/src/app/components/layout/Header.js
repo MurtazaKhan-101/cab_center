@@ -61,10 +61,10 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
   const renderUserSection = () => {
     if (loading || isLoggingOut) {
       return (
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-white/20 rounded-full animate-pulse"></div>
-            <div className="text-white">
+            <div className="text-white hidden xl:block">
               <div className="w-16 h-3 bg-white/20 rounded animate-pulse mb-1"></div>
               <div className="w-24 h-3 bg-white/20 rounded animate-pulse"></div>
             </div>
@@ -76,7 +76,7 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
 
     if (user) {
       return (
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             {user.profileImage ? (
               <Image
@@ -93,8 +93,8 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
                 </span>
               </div>
             )}
-            <div className="text-white">
-              <span className="text-sm hidden sm:flex font-medium text-gray-200 dark:text-gray-100">
+            <div className="text-white hidden xl:block">
+              <span className="text-sm font-medium text-gray-200 dark:text-gray-100">
                   {user.firstName} 
               </span>   
               <p className="text-xs text-gray-200">{user.email}</p>
@@ -114,14 +114,14 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
 
     if (isLoggingOut) {
       return (
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="flex items-center space-x-4">
           <div className="w-32 h-8 bg-white/20 rounded-md animate-pulse"></div>
         </div>
       );
     }
 
     return (
-      <div className="hidden md:flex items-center space-x-4">
+      <div className="flex items-center space-x-4">
         <Link
           href="/auth/login"
           className="bg-[#5C88D7] text-white hover:bg-[#4A75C4] px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -226,21 +226,19 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <Image
+              {/* <Image
                 src="/images/logo.svg"
                 alt="Cab Centre Logo"
                 width={40}
                 height={40}
                 className="h-10 w-auto"
-              />
-              <span className="ml-3 text-xl font-bold text-white hidden sm:block">
-                Cab Centre
-              </span>
+              /> */}
+              <h1 className="text-white font-bold text-lg sm:text-xl lg:text-2xl">{t('herosection.cab_center')}</h1>
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          {/* Desktop Navigation - Only show on larger screens */}
+          <nav className="hidden lg:flex space-x-6 xl:space-x-8">
             <Link
               href="/dashboard"
               className={getLinkClasses("/dashboard")}
@@ -261,16 +259,67 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
             </Link>
           </nav>
 
-          {/* Language Switcher - Desktop */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Language Switcher - Desktop (show on large screens) */}
+          <div className="hidden lg:flex items-center space-x-4">
             <LanguageSwitcher />
           </div>
 
-          {/* User Menu - Desktop */}
-          {renderUserSection()}
+          {/* User Menu - Desktop (hide on tablet, show on desktop) */}
+          <div className="hidden lg:block">
+            {renderUserSection()}
+          </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Tablet/Medium Screen Controls (750-1024px) */}
+          <div className="hidden md:flex lg:hidden items-center space-x-3">
+            <LanguageSwitcher compact />
+            {user && (
+              <button
+                onClick={handleDesktopLogout}
+                className="bg-white text-[#00188F] px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+                disabled={isLoggingOut}
+              >
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </button>
+            )}
+            <button
+              onClick={toggleMenu}
+              className="text-white hover:text-gray-200 p-2 rounded-lg transition-colors"
+              aria-expanded={isMenuOpen}
+              aria-label="Toggle navigation menu"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {isMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
+
+          {/* Mobile Header Controls (below 768px) */}
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Language Switcher - Mobile (moved to header) */}
+            <div className="flex items-center">
+              <LanguageSwitcher compact />
+            </div>
+            
+            {/* Mobile menu button */}
             <button
               onClick={toggleMenu}
               className="text-white hover:text-gray-200 p-2 rounded-lg transition-colors"
@@ -303,9 +352,9 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
+        {/* Mobile/Tablet Navigation Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-white/20">
+          <div className="lg:hidden border-t border-white/20">
             <div className="px-2 pt-2 pb-3 space-y-1 rounded-b-lg">
               <Link
                 href="/dashboard"
@@ -328,11 +377,6 @@ const HeaderComponent = ({ user, onLogout, loading = false }) => {
               >
                 {t('navigation.history') || 'History'}
               </Link>
-
-              {/* Language Switcher - Mobile */}
-              <div className="pt-2">
-                <LanguageSwitcher />
-              </div>
 
               {/* Mobile User Section */}
               <div className="border-t border-white/20 pt-4 mt-4">
