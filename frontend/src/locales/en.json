@@ -281,5 +281,30 @@
     "why_us": "Why us?",
     "how_to_book": "How to Book",
     "copyright": "All rights reserved. Cab Centre © 2025"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "booking_summary": "Booking Summary",
+    "trip_details": "Trip Details",
+    "passenger_details": "Passenger Details",
+    "vehicle_details": "Vehicle Details",
+    "fare_breakdown": "Fare Breakdown",
+    "base_fare": "Base Fare",
+    "total_fare": "Total Fare",
+    "payment_method": "Payment Method",
+    "payment_cash": "Cash Payment",
+    "payment_cash_desc": "Pay with cash to the driver",
+    "payment_card": "Card Payment",
+    "payment_card_desc": "Pay securely with your card",
+    "payment_method_required": "Please select a payment method",
+    "confirm_booking": "Confirm Booking",
+    "processing": "Processing...",
+    "payment_info": "Your payment information is secure and protected"
+  },
+  "common": {
+    "back": "Back",
+    "km": "km",
+    "passengers": "passengers",
+    "currency_sar": "SAR"
   }
 }
