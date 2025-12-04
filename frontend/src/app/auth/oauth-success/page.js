@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { ROUTES } from "../../lib/constants";
 import { Spinner } from "../../components/ui";
 
-export default function OAuthSuccessPage() {
+function OAuthSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { handleOAuthSuccess } = useAuth();
@@ -55,7 +55,7 @@ export default function OAuthSuccessPage() {
     };
 
     handleOAuthCallback();
-  }, [searchParams, router]);
+  }, [searchParams, router, handleOAuthSuccess]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#030303] flex items-center justify-center px-4">
@@ -98,5 +98,26 @@ export default function OAuthSuccessPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function OAuthSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 dark:bg-[#030303] flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="mb-4 flex justify-center">
+              <Spinner size="lg" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Loading...
+            </h2>
+          </div>
+        </div>
+      }
+    >
+      <OAuthSuccessContent />
+    </Suspense>
   );
 }
