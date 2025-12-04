@@ -283,5 +283,30 @@
     "why_us": "لماذا نحن؟",
     "how_to_book": "كيفية الحجز",
     "copyright": "جميع الحقوق محفوظة. كاب سنتر © 2025"
+  },
+  "checkout": {
+    "title": "الدفع",
+    "booking_summary": "ملخص الحجز",
+    "trip_details": "تفاصيل الرحلة",
+    "passenger_details": "تفاصيل الراكب",
+    "vehicle_details": "تفاصيل المركبة",
+    "fare_breakdown": "تفصيل الأجرة",
+    "base_fare": "الأجرة الأساسية",
+    "total_fare": "إجمالي الأجرة",
+    "payment_method": "طريقة الدفع",
+    "payment_cash": "الدفع نقداً",
+    "payment_cash_desc": "ادفع نقداً للسائق",
+    "payment_card": "الدفع بالبطاقة",
+    "payment_card_desc": "ادفع بأمان باستخدام بطاقتك",
+    "payment_method_required": "يرجى اختيار طريقة الدفع",
+    "confirm_booking": "تأكيد الحجز",
+    "processing": "جاري المعالجة...",
+    "payment_info": "معلومات الدفع الخاصة بك آمنة ومحمية"
+  },
+  "common": {
+    "back": "رجوع",
+    "km": "كم",
+    "passengers": "راكب",
+    "currency_sar": "ريال"
   }
 }
