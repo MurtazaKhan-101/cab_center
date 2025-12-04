@@ -12,7 +12,8 @@ export const Button = ({
     "px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
-    primary: "bg-buttons-gradient text-white hover:bg-buttons-gradient-hover active:opacity-90 shadow-lg hover:shadow-xl transform hover:scale-[1.02]",
+    primary:
+      "bg-buttons-gradient text-white hover:bg-buttons-gradient-hover active:opacity-90 shadow-lg hover:shadow-xl transform hover:scale-[1.02]",
     secondary:
       "bg-transparent border-2 border-secondary text-secondary hover:bg-secondary hover:text-white transition-all duration-200",
     outline:
@@ -55,7 +56,8 @@ export const Input = ({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`w-full px-4 py-3 rounded border ${error
+        className={`w-full px-4 py-3 rounded border ${
+          error
             ? "border-red-500 focus:border-red-500"
             : "border-gray-300 dark:border-gray-600 focus:border-secondary"
         } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50 transition-all ${className}`}
@@ -69,18 +71,13 @@ export const Input = ({
 // Card Component - Custom style
 export const Card = ({ children, className = "", variant = "default" }) => {
   const variants = {
-    default: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg",
+    default:
+      "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl shadow-lg",
     gradient: "bg-ui-cards-gradient text-white rounded-xl shadow-lg",
     secondary: "bg-secondary text-white rounded-xl shadow-lg",
   };
 
-  return (
-    <div
-      className={`${variants[variant]} ${className}`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={`${variants[variant]} ${className}`}>{children}</div>;
 };
 
 // Alert Component - Custom style
@@ -150,3 +147,6 @@ export const Divider = ({ text, className = "" }) => {
     </div>
   );
 };
+
+// Export ConfirmationModal
+export { default as ConfirmationModal } from "./ConfirmationModal";

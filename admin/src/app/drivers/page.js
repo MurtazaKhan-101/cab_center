@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
-import { Button, Card, Spinner } from "../components/ui";
+import { Button, Card, Spinner, ConfirmationModal } from "../components/ui";
 import { ROUTES } from "../lib/constants";
 import MainLayout from "../components/layout/MainLayout";
 import AddDriverModal from "./AddDriverModal";
@@ -36,6 +36,8 @@ export default function DriversPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [driverToDelete, setDriverToDelete] = useState(null);
 
   // Fetch drivers from backend
   useEffect(() => {
@@ -202,16 +204,24 @@ export default function DriversPage() {
     }
   };
 
-  const handleDeleteDriver = async (driverId) => {
-    const driverToDelete = drivers.find((driver) => driver.id === driverId);
+  const handleDeleteDriver = (driverId) => {
+    const driver = drivers.find((d) => d.id === driverId);
+    setDriverToDelete(driver);
+    setShowConfirmModal(true);
+  };
+
+  const confirmDeleteDriver = async () => {
+    if (!driverToDelete) return;
 
     const loadingToast = showToast.loading("Deleting driver...");
 
     try {
-      const response = await driverService.deleteDriver(driverId);
+      const response = await driverService.deleteDriver(driverToDelete.id);
 
       if (response.success) {
-        setDrivers((prev) => prev.filter((driver) => driver.id !== driverId));
+        setDrivers((prev) =>
+          prev.filter((driver) => driver.id !== driverToDelete.id)
+        );
         setViewMode("list");
         setSelectedDriver(null);
         showToast.success(
@@ -221,6 +231,9 @@ export default function DriversPage() {
     } catch (error) {
       console.error("Error deleting driver:", error);
       showToast.error("Failed to delete driver");
+    } finally {
+      setShowConfirmModal(false);
+      setDriverToDelete(null);
     }
   };
 
@@ -628,6 +641,22 @@ export default function DriversPage() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={() => {
+          setShowConfirmModal(false);
+          setDriverToDelete(null);
+        }}
+        onConfirm={confirmDeleteDriver}
+        title="Delete Driver"
+        message="Are you sure you want to delete this driver? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        itemName={driverToDelete?.name}
+      />
 
       {/* Add Driver Modal */}
       <AddDriverModal

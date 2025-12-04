@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "../components/ui";
+import { Button, ConfirmationModal } from "../components/ui";
 import {
   ArrowLeft,
   Edit,
@@ -27,13 +27,14 @@ export default function CarProfile({
   initialEditMode = false,
 }) {
   const [isEditing, setIsEditing] = useState(initialEditMode);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [editFormData, setEditFormData] = useState({
     category: car?.category || "",
     registrationNumber: car?.registrationNumber || "",
     model: car?.model || "",
     year: car?.year || "",
-    capacity: car?.capacity || "",
-    farePerKm: car?.farePerKm || "",
+    // capacity: car?.capacity || "",
+    // farePerKm: car?.farePerKm || "",
     availability: car?.availability || "Available",
   });
 
@@ -50,9 +51,9 @@ export default function CarProfile({
       !editFormData.category.trim() ||
       !editFormData.registrationNumber.trim() ||
       !editFormData.model.trim() ||
-      !editFormData.year ||
-      !editFormData.capacity ||
-      !editFormData.farePerKm
+      !editFormData.year
+      // !editFormData.capacity ||
+      // !editFormData.farePerKm
     ) {
       showToast.error("Please fill in all required fields");
       return;
@@ -76,20 +77,18 @@ export default function CarProfile({
       registrationNumber: car?.registrationNumber || "",
       model: car?.model || "",
       year: car?.year || "",
-      capacity: car?.capacity || "",
-      farePerKm: car?.farePerKm || "",
+      // capacity: car?.capacity || "",
+      // farePerKm: car?.farePerKm || "",
       availability: car?.availability || "Available",
     });
     setIsEditing(false);
   };
 
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${car.model} (${car.registrationNumber})? This action cannot be undone.`
-    );
+  const handleDelete = () => {
+    setShowConfirmModal(true);
+  };
 
-    if (!confirmDelete) return;
-
+  const confirmDelete = async () => {
     const toastId = showToast.loading("Deleting vehicle...");
 
     try {
@@ -100,6 +99,8 @@ export default function CarProfile({
       showToast.success("Vehicle deleted successfully!", toastId);
     } catch (error) {
       showToast.error("Failed to delete vehicle. Please try again.", toastId);
+    } finally {
+      setShowConfirmModal(false);
     }
   };
 
@@ -306,7 +307,7 @@ export default function CarProfile({
             </div>
 
             {/* Capacity */}
-            <div>
+            {/* <div>
               <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Users className="w-4 h-4" />
                 <span>Capacity</span>
@@ -328,10 +329,10 @@ export default function CarProfile({
                   {car.capacity} passengers
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Fare Per Km */}
-            <div>
+            {/* <div>
               <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <DollarSign className="w-4 h-4" />
                 <span>Fare Per Km</span>
@@ -353,7 +354,7 @@ export default function CarProfile({
                   SAR {car.farePerKm}/km
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Assigned To */}
             <div>
@@ -457,6 +458,19 @@ export default function CarProfile({
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete Vehicle"
+        message="Are you sure you want to delete this vehicle? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        itemName={car ? `${car.model} (${car.registrationNumber})` : ""}
+      />
     </div>
   );
 }

@@ -19,8 +19,8 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
     registrationNumber: "",
     model: "",
     year: "",
-    farePerKm: "",
-    capacity: "",
+    // farePerKm: "",
+    // capacity: "",
     availability: "Available",
   });
 
@@ -37,23 +37,19 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
       !formData.category.trim() ||
       !formData.registrationNumber.trim() ||
       !formData.model.trim() ||
-      !formData.year ||
-      !formData.farePerKm.trim() ||
-      !formData.capacity.trim()
+      !formData.year
+      // !formData.farePerKm.trim() ||
+      // !formData.capacity.trim()
     ) {
       showToast.error("Please fill in all required fields");
       return;
     }
-
-    // Show loading toast
-    const toastId = showToast.loading("Adding vehicle...");
 
     try {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       onSave(formData);
-      showToast.success("Vehicle added successfully!", toastId);
       handleDiscard();
     } catch (error) {
       showToast.error("Failed to add vehicle. Please try again.", toastId);
@@ -66,8 +62,8 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
       registrationNumber: "",
       model: "",
       year: "",
-      farePerKm: "",
-      capacity: "",
+      // farePerKm: "",
+      // capacity: "",
       availability: "Available",
     });
     onClose();
@@ -165,7 +161,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <DollarSign className="w-4 h-4" />
                 <span>Fare Per Km *</span>
@@ -193,7 +189,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                 min="1"
                 max="20"
               />
-            </div>
+            </div> */}
           </div>
 
           {/* Assigned To and Availability Row */}
@@ -212,7 +208,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
               </p>
             </div>
 
-            <div>
+            {/* <div>
               <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Settings className="w-4 h-4" />
                 <span>Availability</span>
@@ -227,7 +223,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                 <option value="Available">Available</option>
                 <option value="Unavailable">Unavailable</option>
               </select>
-            </div>
+            </div> */}
           </div>
         </div>
 

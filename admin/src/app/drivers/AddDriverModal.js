@@ -285,7 +285,7 @@ export default function AddDriverModal({ isOpen, onClose, onSave }) {
             </div>
 
             {/* Availability */}
-            <div className="mb-6">
+            {/* <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Availability
               </label>
@@ -299,7 +299,7 @@ export default function AddDriverModal({ isOpen, onClose, onSave }) {
                 <option value="Available">Available</option>
                 <option value="Not Available">Not Available</option>
               </select>
-            </div>
+            </div> */}
           </div>
         </div>
 

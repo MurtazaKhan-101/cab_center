@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "../components/ui";
+import { Button, ConfirmationModal } from "../components/ui";
 import {
   ArrowLeft,
   Edit,
@@ -30,6 +30,7 @@ export default function DriverProfile({
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [loadingVehicles, setLoadingVehicles] = useState(false);
   const [unassignVehicle, setUnassignVehicle] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [editFormData, setEditFormData] = useState({
     name: driver?.name || "",
     contact: driver?.contact || "",
@@ -167,13 +168,11 @@ export default function DriverProfile({
     setIsEditing(false);
   };
 
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      `Are you sure you want to delete ${driver.name}? This action cannot be undone.`
-    );
+  const handleDelete = () => {
+    setShowConfirmModal(true);
+  };
 
-    if (!confirmDelete) return;
-
+  const confirmDelete = async () => {
     const toastId = showToast.loading("Deleting driver...");
 
     try {
@@ -181,6 +180,8 @@ export default function DriverProfile({
       showToast.success("Driver deleted successfully!", toastId);
     } catch (error) {
       showToast.error("Failed to delete driver. Please try again.", toastId);
+    } finally {
+      setShowConfirmModal(false);
     }
   };
 
@@ -578,6 +579,19 @@ export default function DriverProfile({
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete Driver"
+        message="Are you sure you want to delete this driver? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+        itemName={driver?.name}
+      />
     </div>
   );
 }

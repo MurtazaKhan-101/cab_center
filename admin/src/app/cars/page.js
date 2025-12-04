@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
-import { Button, Spinner } from "../components/ui";
+import { Button, Spinner, ConfirmationModal } from "../components/ui";
 import {
   Plus,
   Search,
@@ -80,6 +80,8 @@ export default function CarsPage() {
   const [filterAvailability, setFilterAvailability] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [carToDelete, setCarToDelete] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -199,14 +201,22 @@ export default function CarsPage() {
     }
   };
 
-  const handleDeleteCar = async (carId) => {
+  const handleDeleteCar = (carId) => {
+    const car = cars.find((c) => c.id === carId);
+    setCarToDelete(car);
+    setShowConfirmModal(true);
+  };
+
+  const confirmDeleteCar = async () => {
+    if (!carToDelete) return;
+
     const toastId = showToast.loading("Deleting vehicle...");
 
     try {
-      const response = await vehicleService.deleteVehicle(carId);
+      const response = await vehicleService.deleteVehicle(carToDelete.id);
 
       if (response.success) {
-        setCars(cars.filter((car) => car.id !== carId));
+        setCars(cars.filter((car) => car.id !== carToDelete.id));
         setShowProfile(false);
         setSelectedCar(null);
         showToast.success("Vehicle deleted successfully!", toastId);
@@ -214,6 +224,9 @@ export default function CarsPage() {
     } catch (error) {
       console.error("Error deleting vehicle:", error);
       showToast.error("Failed to delete vehicle. Please try again.", toastId);
+    } finally {
+      setShowConfirmModal(false);
+      setCarToDelete(null);
     }
   };
 
@@ -508,6 +521,26 @@ export default function CarsPage() {
             </div>
           )}
         </div>
+
+        {/* Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={showConfirmModal}
+          onClose={() => {
+            setShowConfirmModal(false);
+            setCarToDelete(null);
+          }}
+          onConfirm={confirmDeleteCar}
+          title="Delete Vehicle"
+          message="Are you sure you want to delete this vehicle? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          type="danger"
+          itemName={
+            carToDelete
+              ? `${carToDelete.model} (${carToDelete.registrationNumber})`
+              : ""
+          }
+        />
 
         {/* Add Car Modal */}
         <AddCarModal
