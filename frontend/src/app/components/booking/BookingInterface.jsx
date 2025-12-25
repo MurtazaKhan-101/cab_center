@@ -722,13 +722,13 @@ export default function BookingInterface() {
                     >
                       <div className="text-center space-y-1">
                         <div className="relative flex justify-center">
-                          <Image
+                          {/* <Image
                             src={vehicle.image}
                             alt={vehicle.name}
                             width={48}
                             height={48}
                             className="object-contain"
-                          />
+                          /> */}
                           {/* Seat count badge */}
                           <div className="absolute -top-1 -right-1 bg-primary text-white dark:text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
                             {vehicle.seats}

@@ -45,23 +45,23 @@ export default function Signup() {
     const newErrors = {};
 
     if (!formData.firstName.trim()) {
-      newErrors.firstName = t('errors.first_name_required');
+      newErrors.firstName = t("errors.first_name_required");
     }
 
     if (!formData.lastName.trim()) {
-      newErrors.lastName = t('errors.last_name_required');
+      newErrors.lastName = t("errors.last_name_required");
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = t('errors.email_required');
+      newErrors.email = t("errors.email_required");
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = t('errors.email_invalid');
+      newErrors.email = t("errors.email_invalid");
     }
 
     if (!formData.password) {
-      newErrors.password = t('errors.password_required');
+      newErrors.password = t("errors.password_required");
     } else if (formData.password.length < 8) {
-      newErrors.password = t('errors.password_min_length');
+      newErrors.password = t("errors.password_min_length");
     }
 
     setErrors(newErrors);
@@ -87,7 +87,10 @@ export default function Signup() {
       );
 
       if (result.success) {
-        setAlert({ type: "success", message: t('success.registration_success') });
+        setAlert({
+          type: "success",
+          message: t("success.registration_success"),
+        });
         // Redirect to OTP verification page
         setTimeout(() => {
           window.location.href = `${
@@ -97,13 +100,13 @@ export default function Signup() {
       } else {
         setAlert({
           type: "error",
-          message: result.message || t('errors.registration_failed'),
+          message: result.message || t("errors.registration_failed"),
         });
       }
     } catch (error) {
       setAlert({
         type: "error",
-        message: error.message || t('errors.generic_error'),
+        message: error.message || t("errors.generic_error"),
       });
     } finally {
       setLoading(false);
@@ -127,13 +130,12 @@ export default function Signup() {
               width={120}
               height={120}
             /> */}
-
           </div>
-          <h1 className="text-4xl font-bold mb-4">{t('auth.welcome_cab_center')}</h1>
-          <p className="text-xl opacity-90 mb-8">
-            {t('auth.join_thousands')}
-          </p>
-          <div className="flex justify-center gap-4 mb-8">
+          <h1 className="text-4xl font-bold mb-4">
+            {t("auth.welcome_cab_center")}
+          </h1>
+          <p className="text-xl opacity-90 mb-8">{t("auth.join_thousands")}</p>
+          {/* <div className="flex justify-center gap-4 mb-8">
             <img
               src="/images/sedan.svg"
               alt={t('auth.sedan_alt')}
@@ -155,8 +157,7 @@ export default function Signup() {
               height={76}
           
             />
-          </div>
-       
+          </div> */}
         </div>
       </div>
 
@@ -173,20 +174,20 @@ export default function Signup() {
               className="mx-auto mb-4"
             /> */}
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {t('auth.join_cab_center')}
+              {t("auth.join_cab_center")}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {t('auth.create_account_mobile')}
+              {t("auth.create_account_mobile")}
             </p>
           </div>
 
           {/* Desktop Header */}
           <div className="hidden lg:block mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              {t('auth.create_account_desktop')}
+              {t("auth.create_account_desktop")}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {t('auth.sign_up_subtitle')}
+              {t("auth.sign_up_subtitle")}
             </p>
           </div>
 
@@ -208,14 +209,24 @@ export default function Signup() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="relative">
                   <div className="absolute left-3 top-3 pointer-events-none z-10">
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
                     </svg>
                   </div>
                   <Input
                     type="text"
                     name="firstName"
-                    placeholder={t('auth.first_name_placeholder')}
+                    placeholder={t("auth.first_name_placeholder")}
                     value={formData.firstName}
                     onChange={handleChange}
                     disabled={loading}
@@ -223,17 +234,27 @@ export default function Signup() {
                     className="pl-10"
                   />
                 </div>
-                
+
                 <div className="relative">
                   <div className="absolute left-3 top-3 pointer-events-none z-10">
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
                     </svg>
                   </div>
                   <Input
                     type="text"
                     name="lastName"
-                    placeholder={t('auth.last_name_placeholder')}
+                    placeholder={t("auth.last_name_placeholder")}
                     value={formData.lastName}
                     onChange={handleChange}
                     disabled={loading}
@@ -246,14 +267,24 @@ export default function Signup() {
               {/* Email Field */}
               <div className="relative">
                 <div className="absolute left-3 top-3 pointer-events-none z-10">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
                   </svg>
                 </div>
                 <Input
                   type="email"
                   name="email"
-                  placeholder={t('auth.email_placeholder')}
+                  placeholder={t("auth.email_placeholder")}
                   value={formData.email}
                   onChange={handleChange}
                   disabled={loading}
@@ -265,14 +296,24 @@ export default function Signup() {
               {/* Password Field */}
               <div className="relative">
                 <div className="absolute left-3 top-3 pointer-events-none z-10">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  <svg
+                    className="h-5 w-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
                   </svg>
                 </div>
                 <Input
                   type="password"
                   name="password"
-                  placeholder={t('auth.password_min_placeholder')}
+                  placeholder={t("auth.password_min_placeholder")}
                   value={formData.password}
                   onChange={handleChange}
                   disabled={loading}
@@ -290,10 +331,10 @@ export default function Signup() {
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <Spinner size="sm" className="mr-2" />
-                    {t('auth.creating_account')}
+                    {t("auth.creating_account")}
                   </div>
                 ) : (
-                  t('auth.create_account_button')
+                  t("auth.create_account_button")
                 )}
               </button>
             </form>
@@ -302,7 +343,7 @@ export default function Signup() {
             <div className="flex items-center my-6">
               <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
               <span className="px-4 text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800">
-                {t('auth.or')}
+                {t("auth.or")}
               </span>
               <div className="flex-1 border-t border-gray-300 dark:border-gray-600"></div>
             </div>
@@ -332,7 +373,7 @@ export default function Signup() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                {t('auth.continue_with_google')}
+                {t("auth.continue_with_google")}
               </div>
             </button>
           </div>
@@ -340,26 +381,26 @@ export default function Signup() {
           {/* Login Link */}
           <div className="mt-8 text-center">
             <span className="text-gray-600 dark:text-gray-400">
-              {t('auth.already_have_account')}{" "}
+              {t("auth.already_have_account")}{" "}
             </span>
             <Link
               href={ROUTES.LOGIN}
               className="text-[#00188F] hover:text-[#000729] font-semibold hover:underline transition-colors duration-200"
             >
-              {t('auth.sign_in_link')}
+              {t("auth.sign_in_link")}
             </Link>
           </div>
 
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-              {t('auth.terms_agreement_signup')}{" "}
+              {t("auth.terms_agreement_signup")}{" "}
               <Link href="#" className="text-[#00188F] hover:underline">
-                {t('auth.terms_of_service')}
+                {t("auth.terms_of_service")}
               </Link>{" "}
-              {t('auth.and')}{" "}
+              {t("auth.and")}{" "}
               <Link href="#" className="text-[#00188F] hover:underline">
-                {t('auth.privacy_policy')}
+                {t("auth.privacy_policy")}
               </Link>
             </p>
           </div>
