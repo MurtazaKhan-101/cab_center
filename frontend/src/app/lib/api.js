@@ -23,7 +23,7 @@ class ApiClient {
     this.accessToken = null;
   }
 
-  // Check if token is about to expire (within 2 minutes)
+  // Check if token is about to expire (within 1 minute)
   isTokenExpiringSoon(token) {
     if (!token) return true;
 
@@ -41,8 +41,8 @@ class ApiClient {
       const currentTime = Math.floor(Date.now() / 1000);
       const expiryTime = payload.exp;
 
-      // Check if token expires within 2 minutes (120 seconds)
-      return expiryTime - currentTime < 120;
+      // Check if token expires within 1 minute (60 seconds) - less aggressive than 2 minutes
+      return expiryTime - currentTime < 60;
     } catch (error) {
       console.error("Error decoding token:", error);
       return true;
@@ -152,12 +152,17 @@ class ApiClient {
     // Only check and refresh token for authenticated requests
     if (options.includeAuth !== false) {
       const token = this.getAccessToken();
-      if (token && this.isTokenExpiringSoon(token)) {
-        try {
-          await this.refreshAccessToken();
-        } catch (error) {
-          console.error("Pre-request token refresh failed:", error);
-          // Don't throw here, let the request proceed and handle 401 if needed
+      // Only check expiry if we have a token
+      if (token) {
+        if (this.isTokenExpiringSoon(token)) {
+          try {
+            // This will either refresh or wait for ongoing refresh
+            await this.refreshAccessToken();
+            // Token is now updated, continue with request
+          } catch (error) {
+            console.error("Pre-request token refresh failed:", error);
+            // Don't throw here, let the request proceed and handle 401 if needed
+          }
         }
       }
     }
@@ -166,6 +171,8 @@ class ApiClient {
     const isFormData = options.body instanceof FormData;
 
     const url = `${this.baseURL}${endpoint}`;
+    // Get the current token AFTER potential refresh
+    const currentToken = this.getAccessToken();
     const config = {
       ...options,
       credentials: "include", // Always include cookies
@@ -264,6 +271,15 @@ class ApiClient {
     return this.request(endpoint, {
       ...options,
       method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  // PATCH request
+  async patch(endpoint, data, options = {}) {
+    return this.request(endpoint, {
+      ...options,
+      method: "PATCH",
       body: JSON.stringify(data),
     });
   }

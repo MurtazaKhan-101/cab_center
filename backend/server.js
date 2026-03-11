@@ -14,7 +14,7 @@ const PORT = process.env.PORT;
 // Middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: [process.env.CLIENT_URL, process.env.ADMIN_URL],
     credentials: true,
   })
 );
@@ -25,6 +25,10 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/auth", require("./routes/googleAuthRoutes"));
+app.use("/api/bookings", require("./routes/bookingRoutes"));
+app.use("/api/drivers", require("./routes/driverRoutes"));
+app.use("/api/vehicles", require("./routes/vehicleRoutes"));
+app.use("/api/settings", require("./routes/settingsRoutes"));
 
 // Health check route
 app.get("/", (req, res) => {
@@ -36,7 +40,7 @@ const startServer = async () => {
     await connectDB();
     await testEmailConnection(createTransporter());
     server.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error("Failed to start server:", error);

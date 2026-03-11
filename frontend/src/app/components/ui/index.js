@@ -1,4 +1,14 @@
-// Button Component - Reddit style
+// Header Component
+export { Header } from "../layout/Header";
+
+// Document Upload Component
+export { DocumentUpload } from "../document-uploads/uploads";
+
+// Booking Components
+export { BookingStatus } from "../booking/BookingStatus";
+export { BookingHistory } from "../booking/BookingHistory";
+
+// Button Component - Custom theme style
 export const Button = ({
   children,
   onClick,
@@ -9,12 +19,12 @@ export const Button = ({
   className = "",
 }) => {
   const baseStyles =
-    "px-4 py-2 rounded-full font-bold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
+    "px-4 py-2 rounded-lg font-bold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
 
   const variants = {
-    primary: "bg-[#FF4500] text-white hover:bg-[#ff5414] active:bg-[#cc3700]",
+    primary: "bg-buttons-gradient text-white hover:bg-buttons-gradient-hover",
     secondary:
-      "bg-transparent border border-[#0079D3] text-[#0079D3] hover:bg-[#0079D3] hover:text-white",
+      "bg-transparent border border-[#5C88D7] text-[#5C88D7] hover:bg-buttons-gradient hover:text-white hover:border-transparent",
     outline:
       "bg-transparent border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800",
     google:
@@ -35,7 +45,7 @@ export const Button = ({
   );
 };
 
-// Input Component - Reddit style
+// Input Component - Custom theme style
 export const Input = ({
   type = "text",
   placeholder,
@@ -54,11 +64,11 @@ export const Input = ({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`w-full px-4 py-3 rounded border ${
+        className={`w-full px-4 py-3 rounded-lg border-2 ${
           error
             ? "border-red-500 focus:border-red-500"
-            : "border-gray-300 dark:border-gray-600 focus:border-[#0079D3]"
-        } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#0079D3] focus:ring-opacity-50 transition-all ${className}`}
+            : "border-gray-300 dark:border-gray-600 focus:border-primary"
+        } bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1.5 focus:ring-primary/30 transition-all ${className}`}
         {...props}
       />
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
@@ -66,7 +76,7 @@ export const Input = ({
   );
 };
 
-// Card Component - Reddit style
+// Card Component - Custom theme style
 export const Card = ({ children, className = "" }) => {
   return (
     <div
@@ -77,7 +87,7 @@ export const Card = ({ children, className = "" }) => {
   );
 };
 
-// Alert Component - Reddit style
+// Alert Component - Custom theme style
 export const Alert = ({ type = "info", message, onClose }) => {
   const types = {
     success:
@@ -103,7 +113,7 @@ export const Alert = ({ type = "info", message, onClose }) => {
   );
 };
 
-// Loading Spinner - Reddit style
+// Loading Spinner - Custom theme style
 export const Spinner = ({ size = "md", className = "" }) => {
   const sizes = {
     sm: "w-4 h-4 border-2",
@@ -113,17 +123,17 @@ export const Spinner = ({ size = "md", className = "" }) => {
 
   return (
     <div
-      className={`${sizes[size]} border-gray-200 border-t-[#FF4500] rounded-full animate-spin ${className}`}
+      className={`${sizes[size]} border-gray-200 border-t-[#00188F] rounded-full animate-spin ${className}`}
     ></div>
   );
 };
 
-// Link Component - Reddit style
+// Link Component - Custom theme style
 export const Link = ({ href, children, className = "" }) => {
   return (
     <a
       href={href}
-      className={`text-[#0079D3] hover:underline text-sm ${className}`}
+      className={`text-[#5C88D7] hover:underline text-sm ${className}`}
     >
       {children}
     </a>
@@ -144,3 +154,9 @@ export const Divider = ({ text, className = "" }) => {
     </div>
   );
 };
+
+// Pagination Component
+export { Pagination } from "./Pagination";
+
+// Localized Pagination Component
+export { default as PaginationWithI18n } from "./PaginationWithI18n";

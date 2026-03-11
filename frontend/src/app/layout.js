@@ -3,6 +3,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
+import { LanguageProvider } from "../lib/i18n";
+import LayoutWrapper from "./components/layout/LayoutWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,15 +18,32 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <head>
-        <title>Auth Template - Connect & Share</title>
-        <meta name="description" content="A modern community platform" />
+        <title>Cab Centre - Your Ride, Your Way</title>
+        <meta name="description" content="Premium cab booking service" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const savedLang = localStorage.getItem('language') || 'ar';
+                document.documentElement.lang = savedLang;
+                document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
+              })();
+            `
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
