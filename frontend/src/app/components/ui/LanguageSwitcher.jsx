@@ -1,61 +1,56 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
+import { Globe, ChevronDown } from "lucide-react";
 import { useLanguage } from "../../../lib/i18n";
+
+const LANGUAGES = [
+  { code: 'en', label: 'English', short: 'EN' },
+  { code: 'ar', label: 'العربية', short: 'AR' },
+];
 
 export default function LanguageSwitcher({ compact = false }) {
   const { language, changeLanguage } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
 
-  if (compact) {
-    // Compact version for mobile header
-    return (
-      <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg p-1 border border-white/20">
-        <button
-          onClick={() => changeLanguage('ar')}
-          className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
-            language === 'ar'
-              ? 'bg-[#00188F] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          عربي
-        </button>
-        <button
-          onClick={() => changeLanguage('en')}
-          className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
-            language === 'en'
-              ? 'bg-[#00188F] text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          EN
-        </button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  // Regular version for desktop and non-compact usage
+  const current = LANGUAGES.find(l => l.code === language) || LANGUAGES[0];
+
   return (
-    <div className="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-lg p-1 border border-gray-200 dark:border-gray-700">
+    <div ref={ref} className="relative">
       <button
-        onClick={() => changeLanguage('ar')}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-          language === 'ar'
-            ? 'bg-[#00188F] text-white shadow-sm'
-            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-        }`}
+        onClick={() => setOpen(v => !v)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-white/90 hover:text-white hover:bg-white/15 transition-colors text-sm font-medium"
       >
-        عربي
+        <Globe className="h-4 w-4 flex-shrink-0" />
+        <span>{compact ? current.short : current.label}</span>
+        <ChevronDown className={`h-3.5 w-3.5 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
-      <button
-        onClick={() => changeLanguage('en')}
-        className={`px-3 py-1 rounded-md text-sm font-medium transition-all duration-200 ${
-          language === 'en'
-            ? 'bg-[#00188F] text-white shadow-sm'
-            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-        }`}
-      >
-        EN
-      </button>
+      {open && (
+        <div className="absolute top-full right-0 mt-1.5 w-36 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+          {LANGUAGES.map(({ code, label }) => (
+            <button
+              key={code}
+              onClick={() => { changeLanguage(code); setOpen(false); }}
+              className={`w-full text-left px-4 py-2.5 text-sm font-medium transition-colors ${
+                language === code
+                  ? 'bg-[#008B7E] text-white'
+                  : 'text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -239,14 +239,14 @@
     "password_reset_success": "Password reset successful! Redirecting to login..."
   },
   "herosection": {
-    "cab_center": "CabCenter",
+    "cab_center": "KSA Rides",
     "login": "Login",
-    "signup": "Signup",
-    "hero_title": "Arrive Comfortably, Every Time",
-    "hero_description": "Experience a smarter way to travel. From quick city trips to long-distance journeys, we provide safe, reliable, and comfortable rides  anytime you need them.",
-    "book_now": "Book Now",
+    "signup": "Sign Up",
+    "hero_title": "Your Reliable Worldwide Airport Transfers",
+    "hero_description": "Book your private chauffeur in seconds. Fixed pricing, professional drivers, available 24/7.",
+    "book_now": "See prices",
     "hero_background": "Hero Background",
-    "hero_image_alt": "Professional Middle Eastern businessman using laptop - CabCenter reliable service"
+    "hero_image_alt": "KSA Rides – Professional airport transfers"
   },
   "feature_section": {
     "reliable_service_title": "Reliable, On-Time Service",
@@ -275,12 +275,12 @@
   },
 
   "footer": {
-    "cab_center": "CabCenter",
+    "cab_center": "KSA Rides",
     "home": "Home",
     "faq": "FAQ",
     "why_us": "Why us?",
     "how_to_book": "How to Book",
-    "copyright": "All rights reserved. Cab Centre © 2025"
+    "copyright": "© 2025 KSA Rides. All rights reserved."
   },
   "checkout": {
     "title": "Checkout",
