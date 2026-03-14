@@ -4,15 +4,19 @@
   --color-background: #ffffff;
   --color-foreground: #111827;
 
-  --gradient-sidebar: linear-gradient(90deg, #00188F 0%, #000729 100%);
-  --gradient-buttons: linear-gradient(90deg, #00188F 0%, #000729 100%);
-  --gradient-chat: linear-gradient(180deg, #00188F 0%, #000729 100%);
-  --gradient-buttons-hover: linear-gradient(90deg, #000729 0%, #00188F 100%);
-  --gradient-ui-cards: linear-gradient(90deg, #00188F 0%, #000729 100%);
+  --gradient-sidebar: linear-gradient(296.47deg, #005F56 -2.82%, #00B1C5 97.17%);
+  --gradient-buttons: linear-gradient(296.47deg, #005F56 -2.82%, #00B1C5 97.17%);
+  --gradient-chat: linear-gradient(180deg, #005F56 0%, #00B1C5 100%);
+  --gradient-buttons-hover: linear-gradient(296.47deg, #00B1C5 -2.82%, #005F56 97.17%);
+  --gradient-ui-cards: linear-gradient(296.47deg, #005F56 -2.82%, #00B1C5 97.17%);
 
-  --color-auth-btn-bg: #00188F;
-  --color-primary: #00188F;
-  --color-secondary: #5C88D7;
+  --color-auth-btn-bg: #005F56;
+  --color-primary: #005F56;
+  --color-secondary: #00B1C5;
+
+  --color-brand-dark: #005F56;
+  --color-brand-light: #00B1C5;
+  --color-surface: #EDF4F7;
 }
 
 @layer base, components, utilities;
@@ -45,7 +49,7 @@
   body {
     background: var(--color-background);
     color: var(--color-foreground);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--font-poppins), 'Poppins', sans-serif;
     min-height: 100vh;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
   }
@@ -176,7 +180,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), 'Poppins', sans-serif;
 }
 
 /* Utility classes */
