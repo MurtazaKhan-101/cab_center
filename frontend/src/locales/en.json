@@ -91,9 +91,12 @@
     "sar_currency": "SAR"
   },
   "vehicles": {
-    "sedan": "Sedan",
-    "suv": "SUV",
-    "mini van": "Mini Van"
+    "economy": "Economy",
+    "standard": "Standard",
+    "first_class": "First Class",
+    "standard_van": "Standard Van",
+    "first_class_van": "First Class Van",
+    "minibus": "Minibus"
   },
   "validation": {
     "pickup_required": "Pickup location is required",

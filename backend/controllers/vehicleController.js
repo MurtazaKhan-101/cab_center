@@ -12,6 +12,8 @@ class VehicleController {
         year,
         farePerKm,
         capacity,
+        luggage_capacity,
+        description,
         assigned_driver_id,
       } = req.body;
 
@@ -58,7 +60,6 @@ class VehicleController {
         }
       }
 
-      // Create vehicle
       const vehicle = new Vehicle({
         vehicle_type,
         registration_number: registration_number.toUpperCase(),
@@ -66,6 +67,8 @@ class VehicleController {
         year,
         fare_per_km: farePerKm,
         capacity,
+        luggage_capacity: luggage_capacity || capacity,
+        description: description || "",
         assigned_driver_id: assigned_driver_id || null,
         availability_status: "available",
       });
@@ -340,6 +343,8 @@ class VehicleController {
             _id: "$vehicle_type",
             fare_per_km: { $first: "$fare_per_km" },
             capacity: { $first: "$capacity" },
+            luggage_capacity: { $first: "$luggage_capacity" },
+            description: { $first: "$description" },
             available_count: {
               $sum: {
                 $cond: [{ $eq: ["$availability_status", "available"] }, 1, 0],
@@ -353,6 +358,8 @@ class VehicleController {
             vehicle_type: "$_id",
             fare_per_km: 1,
             capacity: 1,
+            luggage_capacity: 1,
+            description: 1,
             available_count: 1,
           },
         },

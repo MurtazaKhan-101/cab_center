@@ -7,6 +7,7 @@ import {
   ChevronDown, Plane, Timer,
 } from 'lucide-react';
 import { useTranslation } from '../../../lib/i18n';
+import PlacesAutocomplete from '../common/PlacesAutocomplete';
 
 const DURATION_OPTIONS = [2, 3, 4, 5, 6, 7, 8, 10, 12];
 
@@ -41,17 +42,25 @@ export default function HeroSection({
   const handleSeePrice = () => {
     const params = new URLSearchParams({
       from,
-      to,
+      to: serviceType === 'hourly' ? from : to,
       date: pickupDate,
       time: pickupTime,
       passengers: String(passengers),
+      serviceType,
     });
+    if (serviceType === 'hourly') {
+      params.set('duration', String(duration));
+    }
+    if (showReturn && returnDate) {
+      params.set('returnDate', returnDate);
+      params.set('returnTime', returnTime);
+      params.set('isRoundTrip', '1');
+    }
     window.location.href = `/vehicles?${params.toString()}`;
   };
 
-  /* Default heading if none passed */
   const heading = title ?? (
-    <>Your Reliable Worldwid Airport Transfers</>
+    <>Your Reliable Worldwide Airport Transfers</>
   );
 
   if (!isInitialized) return <div className="min-h-screen bg-white" />;
@@ -98,35 +107,23 @@ export default function HeroSection({
               <div className="p-4 space-y-3">
 
                 {/* From */}
-                <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus-within:border-[#00B1C5] transition-colors">
-                  <MapPin className="h-5 w-5 text-[#00B1C5] flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs text-gray-400 font-medium mb-0.5">From</div>
-                    <input
-                      type="text"
-                      placeholder="Address, airport, hotel, ..."
-                      value={from}
-                      onChange={(e) => setFrom(e.target.value)}
-                      className="w-full bg-transparent text-gray-700 placeholder-gray-400 text-sm outline-none"
-                    />
-                  </div>
-                </div>
+                <PlacesAutocomplete
+                  value={from}
+                  onChange={setFrom}
+                  placeholder="Address, airport, hotel, ..."
+                  icon={<MapPin className="h-5 w-5 text-[#00B1C5]" />}
+                  label="From"
+                />
 
                 {/* To — transfer only */}
                 {serviceType === 'transfer' && (
-                  <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus-within:border-[#00B1C5] transition-colors">
-                    <MapPin className="h-5 w-5 text-[#005F56] flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs text-gray-400 font-medium mb-0.5">To</div>
-                      <input
-                        type="text"
-                        placeholder="Address, airport, hotel, ..."
-                        value={to}
-                        onChange={(e) => setTo(e.target.value)}
-                        className="w-full bg-transparent text-gray-700 placeholder-gray-400 text-sm outline-none"
-                      />
-                    </div>
-                  </div>
+                  <PlacesAutocomplete
+                    value={to}
+                    onChange={setTo}
+                    placeholder="Address, airport, hotel, ..."
+                    icon={<MapPin className="h-5 w-5 text-[#005F56]" />}
+                    label="To"
+                  />
                 )}
 
                 {/* Date & Time row */}

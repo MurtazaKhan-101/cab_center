@@ -193,10 +193,13 @@ class BookingController {
     }
   }
 
-  // Create a new booking (User)
+  // Create a new booking (User or Guest)
   async createBooking(req, res) {
     try {
       const {
+        service_type,
+        first_name,
+        last_name,
         user_name,
         contact_number,
         email,
@@ -209,11 +212,24 @@ class BookingController {
         date,
         time,
         payment_method,
+        flight_number,
+        child_seat,
+        driver_notes,
+        meet_greet_name,
+        is_round_trip,
+        return_date,
+        return_time,
+        duration_hours,
       } = req.body;
 
-      // Validation
+      // Derive display name from first/last or fall back to user_name
+      const resolvedName =
+        first_name && last_name
+          ? `${first_name} ${last_name}`.trim()
+          : user_name || "";
+
       if (
-        !user_name ||
+        !resolvedName ||
         !contact_number ||
         !email ||
         !no_of_passengers ||
@@ -221,8 +237,7 @@ class BookingController {
         !drop ||
         !vehicle_type ||
         !date ||
-        !time ||
-        !payment_method
+        !time
       ) {
         return res.status(400).json({
           success: false,
@@ -230,8 +245,8 @@ class BookingController {
         });
       }
 
-      // Get user ID from authenticated user
-      const user_id = req.user._id;
+      // user_id is optional — present when authenticated, null for guests
+      const user_id = req.user ? req.user._id : null;
 
       // Calculate fare
       const total_fare = await this.calculateFare(
@@ -242,10 +257,12 @@ class BookingController {
         pickup
       );
 
-      // Create booking
       const booking = new Booking({
         user_id,
-        user_name,
+        service_type: service_type || "transfer",
+        first_name: first_name || "",
+        last_name: last_name || "",
+        user_name: resolvedName,
         contact_number,
         email,
         no_of_passengers,
@@ -256,9 +273,17 @@ class BookingController {
         vehicle_type,
         date: new Date(date),
         time,
-        payment_method,
+        payment_method: payment_method || "card",
         total_fare,
         status: "pending",
+        flight_number: flight_number || "",
+        child_seat: child_seat || false,
+        driver_notes: driver_notes || "",
+        meet_greet_name: meet_greet_name || "",
+        is_round_trip: is_round_trip || false,
+        return_date: return_date ? new Date(return_date) : null,
+        return_time: return_time || "",
+        duration_hours: duration_hours || null,
       });
 
       await booking.save();
@@ -616,7 +641,7 @@ class BookingController {
     }
   }
 
-  // Download booking receipt PDF (Admin)
+  // Download booking receipt PDF
   async downloadReceipt(req, res) {
     try {
       const { id } = req.params;
@@ -633,49 +658,49 @@ class BookingController {
         });
       }
 
-      if (booking.status !== "approved") {
-        return res.status(400).json({
-          success: false,
-          message: "Only approved bookings can have receipts generated",
-        });
-      }
-
-      // Create PDF
       const doc = new PDFDocument({ margin: 50 });
 
-      // Set response headers
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
         `attachment; filename=booking-receipt-${booking._id}.pdf`
       );
 
-      // Pipe PDF to response
       doc.pipe(res);
 
-      // Add content to PDF
-      doc.fontSize(20).text("CAB CENTER", { align: "center" });
-      doc.fontSize(16).text("Booking Receipt", { align: "center" });
+      // Header
+      doc.fontSize(20).text("KSA RIDES", { align: "center" });
+      doc.fontSize(14).text("Booking Receipt", { align: "center" });
       doc.moveDown();
 
-      // Booking Details
-      doc.fontSize(12).text(`Booking ID: ${booking._id}`, { underline: true });
+      // Reference
+      const ref = `KSA-${booking._id.toString().slice(-6).toUpperCase()}`;
+      doc.fontSize(12).text(`Booking Reference: ${ref}`, { underline: true });
       doc.moveDown(0.5);
 
       doc.fontSize(11);
       doc.text(`Date: ${moment(booking.date).format("DD MMM YYYY")}`);
       doc.text(`Time: ${booking.time}`);
       doc.text(`Status: ${booking.status.toUpperCase()}`);
+      if (booking.service_type) {
+        doc.text(
+          `Service: ${booking.service_type === "hourly" ? "Hourly Chauffeur" : "Transfer"}`
+        );
+      }
       doc.moveDown();
 
       // Passenger Details
       doc.fontSize(12).text("Passenger Information:", { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11);
-      doc.text(`Name: ${booking.user_name}`);
+      const displayName =
+        booking.first_name && booking.last_name
+          ? `${booking.first_name} ${booking.last_name}`
+          : booking.user_name || "Guest";
+      doc.text(`Name: ${displayName}`);
       doc.text(`Contact: ${booking.contact_number}`);
       doc.text(`Email: ${booking.email}`);
-      doc.text(`Number of Passengers: ${booking.no_of_passengers}`);
+      doc.text(`Passengers: ${booking.no_of_passengers}`);
       if (booking.special_requirements) {
         doc.text(`Special Requirements: ${booking.special_requirements}`);
       }
@@ -685,51 +710,80 @@ class BookingController {
       doc.fontSize(12).text("Trip Details:", { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(11);
-      doc.text(`Pickup Location: ${booking.pickup}`);
-      doc.text(`Drop Location: ${booking.drop}`);
-      doc.text(`Distance: ${booking.distance_km} km`);
+      doc.text(`Pickup: ${booking.pickup}`);
+      doc.text(`Drop-off: ${booking.drop}`);
+      if (booking.distance_km) {
+        doc.text(`Distance: ${booking.distance_km} km`);
+      }
+      const vehicleLabel = (booking.vehicle_type || "")
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      doc.text(`Vehicle: ${vehicleLabel}`);
       doc.moveDown();
 
-      // Vehicle Details
+      // Extras
+      if (
+        booking.flight_number ||
+        booking.child_seat ||
+        booking.meet_greet_name
+      ) {
+        doc.fontSize(12).text("Extras:", { underline: true });
+        doc.moveDown(0.5);
+        doc.fontSize(11);
+        if (booking.flight_number)
+          doc.text(`Flight Number: ${booking.flight_number}`);
+        if (booking.child_seat) doc.text("Child Seat: Yes");
+        if (booking.meet_greet_name)
+          doc.text(`Meet & Greet Name: ${booking.meet_greet_name}`);
+        doc.moveDown();
+      }
+
+      // Assigned vehicle & driver (if present)
       if (booking.vehicle_id) {
         doc.fontSize(12).text("Vehicle Information:", { underline: true });
         doc.moveDown(0.5);
         doc.fontSize(11);
-        doc.text(`Type: ${booking.vehicle_id.vehicle_type.toUpperCase()}`);
         doc.text(`Model: ${booking.vehicle_id.model}`);
         doc.text(`Registration: ${booking.vehicle_id.registration_number}`);
         doc.moveDown();
       }
 
-      // Driver Details
       if (booking.driver_id) {
         doc.fontSize(12).text("Driver Information:", { underline: true });
         doc.moveDown(0.5);
         doc.fontSize(11);
         doc.text(`Name: ${booking.driver_id.name}`);
         doc.text(`Contact: ${booking.driver_id.contact_number}`);
-        doc.text(`License: ${booking.driver_id.license_number}`);
         doc.moveDown();
       }
 
-      // Fare Details
+      // Fare
       doc.fontSize(12).text("Fare Information:", { underline: true });
       doc.moveDown(0.5);
       doc
         .fontSize(14)
-        .text(`Total Fare: SAR${booking.total_fare}`, { bold: true });
+        .text(`Total Fare: SAR ${booking.total_fare.toFixed(2)}`, {
+          bold: true,
+        });
       doc.moveDown();
 
+      // Round trip
+      if (booking.is_round_trip && booking.return_date) {
+        doc.fontSize(11).text(
+          `Return: ${moment(booking.return_date).format("DD MMM YYYY")}${booking.return_time ? ` at ${booking.return_time}` : ""}`
+        );
+        doc.moveDown();
+      }
+
       // Footer
-      doc.fontSize(10).text("Thank you for choosing Cab Center!", {
+      doc.moveDown();
+      doc.fontSize(10).text("Thank you for choosing KSA Rides!", {
         align: "center",
-        italics: true,
       });
       doc.text("For any queries, please contact our support team.", {
         align: "center",
       });
 
-      // Finalize PDF
       doc.end();
     } catch (error) {
       console.error("Error generating receipt:", error);

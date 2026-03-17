@@ -10,8 +10,19 @@ import {
   Users,
   Settings,
   DollarSign,
+  Briefcase,
+  FileText,
 } from "lucide-react";
 import { showToast } from "../lib/toast";
+
+const VEHICLE_CATEGORIES = [
+  { value: "economy", label: "Economy" },
+  { value: "standard", label: "Standard" },
+  { value: "first_class", label: "First Class" },
+  { value: "standard_van", label: "Standard Van" },
+  { value: "first_class_van", label: "First Class Van" },
+  { value: "minibus", label: "Minibus" },
+];
 
 export default function AddCarModal({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -19,8 +30,10 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
     registrationNumber: "",
     model: "",
     year: "",
-    // farePerKm: "",
-    // capacity: "",
+    farePerKm: "",
+    capacity: "",
+    luggage_capacity: "",
+    description: "",
     availability: "Available",
   });
 
@@ -32,27 +45,24 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
   };
 
   const handleSave = async () => {
-    // Validate form data before saving
     if (
       !formData.category.trim() ||
       !formData.registrationNumber.trim() ||
       !formData.model.trim() ||
-      !formData.year
-      // !formData.farePerKm.trim() ||
-      // !formData.capacity.trim()
+      !formData.year ||
+      !formData.farePerKm ||
+      !formData.capacity
     ) {
       showToast.error("Please fill in all required fields");
       return;
     }
 
     try {
-      // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       onSave(formData);
       handleDiscard();
     } catch (error) {
-      showToast.error("Failed to add vehicle. Please try again.", toastId);
+      showToast.error("Failed to add vehicle. Please try again.");
     }
   };
 
@@ -62,14 +72,19 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
       registrationNumber: "",
       model: "",
       year: "",
-      // farePerKm: "",
-      // capacity: "",
+      farePerKm: "",
+      capacity: "",
+      luggage_capacity: "",
+      description: "",
       availability: "Available",
     });
     onClose();
   };
 
   if (!isOpen) return null;
+
+  const inputCls =
+    "w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all";
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -100,12 +115,14 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
               <select
                 value={formData.category}
                 onChange={(e) => handleInputChange("category", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                className={inputCls}
               >
                 <option value="">Select category</option>
-                <option value="SUV">SUV</option>
-                <option value="Sedan">Sedan</option>
-                <option value="Mini Van">Mini Van</option>
+                {VEHICLE_CATEGORIES.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -121,7 +138,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                 onChange={(e) =>
                   handleInputChange("registrationNumber", e.target.value)
                 }
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                className={inputCls}
               />
             </div>
           </div>
@@ -138,7 +155,7 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                 placeholder="e.g., Camry, Prado, Hiace"
                 value={formData.model}
                 onChange={(e) => handleInputChange("model", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                className={inputCls}
               />
             </div>
 
@@ -150,49 +167,91 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
               <select
                 value={formData.year}
                 onChange={(e) => handleInputChange("year", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                className={inputCls}
               >
                 <option value="">Select year</option>
-                {Array.from({ length: 20 }, (_, i) => 2025 - i).map((year) => (
+                {Array.from({ length: 20 }, (_, i) => 2026 - i).map((year) => (
                   <option key={year} value={year}>
                     {year}
                   </option>
                 ))}
               </select>
             </div>
+          </div>
 
-            {/* <div>
+          {/* Fare & Capacity Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
               <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <DollarSign className="w-4 h-4" />
-                <span>Fare Per Km *</span>
+                <span>Fare Per Km (SAR) *</span>
               </label>
               <input
-                type="text"
+                type="number"
+                step="0.01"
+                min="0"
                 placeholder="e.g., 2.50"
                 value={formData.farePerKm}
                 onChange={(e) => handleInputChange("farePerKm", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                className={inputCls}
               />
             </div>
 
             <div>
               <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Users className="w-4 h-4" />
-                <span>Capacity *</span>
+                <span>Passenger Capacity *</span>
               </label>
               <input
                 type="number"
                 placeholder="e.g., 4"
                 value={formData.capacity}
                 onChange={(e) => handleInputChange("capacity", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+                className={inputCls}
                 min="1"
                 max="20"
               />
-            </div> */}
+            </div>
           </div>
 
-          {/* Assigned To and Availability Row */}
+          {/* Luggage & Description Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <Briefcase className="w-4 h-4" />
+                <span>Luggage Capacity</span>
+              </label>
+              <input
+                type="number"
+                placeholder="e.g., 3"
+                value={formData.luggage_capacity}
+                onChange={(e) =>
+                  handleInputChange("luggage_capacity", e.target.value)
+                }
+                className={inputCls}
+                min="0"
+                max="30"
+              />
+            </div>
+
+            <div>
+              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <FileText className="w-4 h-4" />
+                <span>Description</span>
+              </label>
+              <input
+                type="text"
+                placeholder="e.g., Toyota Camry, Honda Accord or similar"
+                value={formData.description}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
+                className={inputCls}
+              />
+            </div>
+          </div>
+
+          {/* Assigned To */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -207,23 +266,6 @@ export default function AddCarModal({ isOpen, onClose, onSave }) {
                 Vehicle assignments are managed from Driver Management section
               </p>
             </div>
-
-            {/* <div>
-              <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                <Settings className="w-4 h-4" />
-                <span>Availability</span>
-              </label>
-              <select
-                value={formData.availability}
-                onChange={(e) =>
-                  handleInputChange("availability", e.target.value)
-                }
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
-              >
-                <option value="Available">Available</option>
-                <option value="Unavailable">Unavailable</option>
-              </select>
-            </div> */}
           </div>
         </div>
 

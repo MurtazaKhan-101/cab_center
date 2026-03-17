@@ -199,19 +199,34 @@ function ExtrasContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const from       = searchParams.get('from')       || '';
-  const to         = searchParams.get('to')         || '';
-  const date       = searchParams.get('date')       || '';
-  const time       = searchParams.get('time')       || '';
-  const passengers = searchParams.get('passengers') || '1';
-  const vehicle    = searchParams.get('vehicle')    || 'economy';
+  const from        = searchParams.get('from')        || '';
+  const to          = searchParams.get('to')          || '';
+  const date        = searchParams.get('date')        || '';
+  const time        = searchParams.get('time')        || '';
+  const passengers  = searchParams.get('passengers')  || '1';
+  const vehicle     = searchParams.get('vehicle')     || 'economy';
+  const serviceType = searchParams.get('serviceType') || 'transfer';
+  const distanceKm  = searchParams.get('distanceKm')  || '';
+  const durationMin = searchParams.get('durationMin') || '';
+  const fare        = searchParams.get('fare')        || '';
+  const duration    = searchParams.get('duration')    || '';
+  const isRoundTrip = searchParams.get('isRoundTrip') || '';
+  const returnDate  = searchParams.get('returnDate')  || '';
+  const returnTime  = searchParams.get('returnTime')  || '';
 
   const [flightNumber, setFlightNumber] = useState('');
   const [childSeat, setChildSeat] = useState(false);
   const [driverNotes, setDriverNotes] = useState('');
 
   const buildParams = (extra = {}) => {
-    const p = { from, to, date, time, passengers, vehicle, flightNumber, childSeat: childSeat ? '1' : '0', driverNotes, ...extra };
+    const p = {
+      from, to, date, time, passengers, vehicle, serviceType,
+      distanceKm, durationMin, fare,
+      flightNumber, childSeat: childSeat ? '1' : '0', driverNotes,
+      ...extra,
+    };
+    if (duration) p.duration = duration;
+    if (isRoundTrip) { p.isRoundTrip = isRoundTrip; p.returnDate = returnDate; p.returnTime = returnTime; }
     return new URLSearchParams(p).toString();
   };
 
@@ -220,7 +235,10 @@ function ExtrasContent() {
   };
 
   const handleBack = () => {
-    const params = new URLSearchParams({ from, to, date, time, passengers });
+    const params = new URLSearchParams({ from, to, date, time, passengers, serviceType });
+    if (distanceKm) params.set('distanceKm', distanceKm);
+    if (duration) params.set('duration', duration);
+    if (isRoundTrip) { params.set('isRoundTrip', isRoundTrip); params.set('returnDate', returnDate); params.set('returnTime', returnTime); }
     router.push(`/vehicles?${params.toString()}`);
   };
 

@@ -5,7 +5,14 @@ const vehicleSchema = new mongoose.Schema(
     vehicle_type: {
       type: String,
       required: true,
-      enum: ["sedan", "suv", "luxury", "van", "mini van"],
+      enum: [
+        "economy",
+        "standard",
+        "first_class",
+        "standard_van",
+        "first_class_van",
+        "minibus",
+      ],
     },
     registration_number: {
       type: String,
@@ -44,6 +51,16 @@ const vehicleSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 1,
+    },
+    luggage_capacity: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    description: {
+      type: String,
+      trim: true,
+      default: "",
     },
   },
   {

@@ -54,18 +54,21 @@ export default function BookingsPage() {
           // Transform backend data to frontend format
           const transformedBookings = response.bookings.map((b) => ({
             id: b._id,
-            name: b.user_name,
+            name: b.user_name || `${b.first_name || ''} ${b.last_name || ''}`.trim() || 'Guest',
+            firstName: b.first_name || '',
+            lastName: b.last_name || '',
             pickupPoint: b.pickup,
             dropPoint: b.drop,
+            vehicleType: b.vehicle_type,
             vehicle:
-              b.vehicle_type.charAt(0).toUpperCase() + b.vehicle_type.slice(1),
+              b.vehicle_type.charAt(0).toUpperCase() + b.vehicle_type.slice(1).replace(/_/g, ' '),
             phone: b.contact_number,
             date: new Date(b.date).toLocaleDateString("en-GB"),
             time: b.time,
             paymentMethod: b.payment_method,
             status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
             rawStatus: b.status,
-            customerType: "Regular",
+            customerType: b.user_id ? "Registered" : "Guest",
             distance: `${b.distance_km} km`,
             estimatedFare: `SAR ${b.total_fare}`,
             assignedDriver: b.driver_id?.name || null,
@@ -75,6 +78,15 @@ export default function BookingsPage() {
             passengers: b.no_of_passengers,
             email: b.email,
             notes: b.special_requirements,
+            serviceType: b.service_type || 'transfer',
+            flightNumber: b.flight_number || '',
+            childSeat: b.child_seat || false,
+            driverNotes: b.driver_notes || '',
+            meetGreetName: b.meet_greet_name || '',
+            isRoundTrip: b.is_round_trip || false,
+            returnDate: b.return_date ? new Date(b.return_date).toLocaleDateString("en-GB") : '',
+            returnTime: b.return_time || '',
+            durationHours: b.duration_hours || null,
           }));
           setBookings(transformedBookings);
         }
@@ -323,25 +335,39 @@ export default function BookingsPage() {
       if (response.success) {
         const transformedBookings = response.bookings.map((b) => ({
           id: b._id,
-          name: b.user_name,
+          name: b.user_name || `${b.first_name || ''} ${b.last_name || ''}`.trim() || 'Guest',
+          firstName: b.first_name || '',
+          lastName: b.last_name || '',
           pickupPoint: b.pickup,
           dropPoint: b.drop,
+          vehicleType: b.vehicle_type,
           vehicle:
-            b.vehicle_type.charAt(0).toUpperCase() + b.vehicle_type.slice(1),
+            b.vehicle_type.charAt(0).toUpperCase() + b.vehicle_type.slice(1).replace(/_/g, ' '),
           phone: b.contact_number,
           date: new Date(b.date).toLocaleDateString("en-GB"),
           time: b.time,
+          paymentMethod: b.payment_method,
           status: b.status.charAt(0).toUpperCase() + b.status.slice(1),
-          customerType: "Regular",
+          rawStatus: b.status,
+          customerType: b.user_id ? "Registered" : "Guest",
           distance: `${b.distance_km} km`,
           estimatedFare: `SAR ${b.total_fare}`,
           assignedDriver: b.driver_id?.name || null,
-          assignedVehicle: b.driver_id?.vehicle_id
-            ? `${b.driver_id.vehicle_id.registration_number} - ${b.driver_id.vehicle_id.model}`
+          assignedVehicle: b.vehicle_id
+            ? `${b.vehicle_id.registration_number} - ${b.vehicle_id.model}`
             : null,
-          passengers: b.passengers,
+          passengers: b.no_of_passengers,
           email: b.email,
           notes: b.special_requirements,
+          serviceType: b.service_type || 'transfer',
+          flightNumber: b.flight_number || '',
+          childSeat: b.child_seat || false,
+          driverNotes: b.driver_notes || '',
+          meetGreetName: b.meet_greet_name || '',
+          isRoundTrip: b.is_round_trip || false,
+          returnDate: b.return_date ? new Date(b.return_date).toLocaleDateString("en-GB") : '',
+          returnTime: b.return_time || '',
+          durationHours: b.duration_hours || null,
         }));
         setBookings(transformedBookings);
       }

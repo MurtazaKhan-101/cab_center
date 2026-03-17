@@ -25,121 +25,6 @@ export default function AssignVehicleModal({
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock data for available vehicles with drivers based on category
-  const mockVehicleData = {
-    SUV: [
-      {
-        id: 1,
-        registrationNumber: "KSA 2370",
-        model: "Prado",
-        year: 2022,
-        category: "SUV",
-        driverName: "Ahmed Malik",
-        driverPhone: "+966501234567",
-        driverRating: 4.8,
-        driverExperience: "5 years",
-        lastLocation: "King Fahd Road",
-        estimatedArrival: "8 minutes",
-        totalTrips: 342,
-        status: "Available",
-      },
-      {
-        id: 2,
-        registrationNumber: "KSA 2375",
-        model: "X7",
-        year: 2020,
-        category: "SUV",
-        driverName: "Hassan Afzal",
-        driverPhone: "+966507654321",
-        driverRating: 4.6,
-        driverExperience: "3 years",
-        lastLocation: "Olaya District",
-        estimatedArrival: "12 minutes",
-        totalTrips: 198,
-        status: "Available",
-      },
-    ],
-    Sedan: [
-      {
-        id: 3,
-        registrationNumber: "KSA 2371",
-        model: "Camry",
-        year: 2021,
-        category: "Sedan",
-        driverName: "Umair Musa",
-        driverPhone: "+966509876543",
-        driverRating: 4.9,
-        driverExperience: "7 years",
-        lastLocation: "Business District",
-        estimatedArrival: "5 minutes",
-        totalTrips: 567,
-        status: "Available",
-      },
-      {
-        id: 4,
-        registrationNumber: "KSA 2374",
-        model: "Corolla",
-        year: 2018,
-        category: "Sedan",
-        driverName: "Badar Islam",
-        driverPhone: "+966502345678",
-        driverRating: 4.7,
-        driverExperience: "4 years",
-        lastLocation: "Downtown",
-        estimatedArrival: "15 minutes",
-        totalTrips: 289,
-        status: "Available",
-      },
-    ],
-    "Mini Van": [
-      {
-        id: 5,
-        registrationNumber: "KSA 2372",
-        model: "Hiace",
-        year: 2009,
-        category: "Mini Van",
-        driverName: "Ijaz Aslam",
-        driverPhone: "+966505432167",
-        driverRating: 4.5,
-        driverExperience: "8 years",
-        lastLocation: "Airport Road",
-        estimatedArrival: "18 minutes",
-        totalTrips: 756,
-        status: "Available",
-      },
-      {
-        id: 6,
-        registrationNumber: "KSA 2376",
-        model: "Hiace",
-        year: 2022,
-        category: "Mini Van",
-        driverName: "Muzammil",
-        driverPhone: "+966508765432",
-        driverRating: 4.4,
-        driverExperience: "2 years",
-        lastLocation: "King Khalid Airport",
-        estimatedArrival: "25 minutes",
-        totalTrips: 134,
-        status: "Available",
-      },
-      {
-        id: 7,
-        registrationNumber: "KSA 2373",
-        model: "Sitaria",
-        year: 2012,
-        category: "Mini Van",
-        driverName: "Ahmed Bilal",
-        driverPhone: "+966503456789",
-        driverRating: 4.6,
-        driverExperience: "6 years",
-        lastLocation: "Diplomatic Quarter",
-        estimatedArrival: "10 minutes",
-        totalTrips: 423,
-        status: "Available",
-      },
-    ],
-  };
-
   useEffect(() => {
     const fetchAvailableDrivers = async () => {
       if (!isOpen || !booking) return;
@@ -149,7 +34,7 @@ export default function AssignVehicleModal({
         const response = await driverService.getAvailableDrivers();
         if (response.success) {
           // Filter drivers with vehicles matching the requested category
-          const vehicleType = booking.vehicle.toLowerCase();
+          const vehicleType = (booking.vehicleType || booking.vehicle).toLowerCase();
           const matchingDrivers = response.drivers.filter(
             (driver) =>
               driver.assigned_vehicle_id &&

@@ -4,6 +4,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 import { LanguageProvider } from "../lib/i18n";
+import GoogleMapsProvider from "../lib/GoogleMapsProvider";
 import LayoutWrapper from "./components/layout/LayoutWrapper";
 
 const poppins = Poppins({
@@ -34,11 +35,13 @@ export default function RootLayout({ children }) {
         className={`${poppins.variable} antialiased`}
       >
         <LanguageProvider>
-          <AuthProvider>
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
-          </AuthProvider>
+          <GoogleMapsProvider>
+            <AuthProvider>
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
+            </AuthProvider>
+          </GoogleMapsProvider>
         </LanguageProvider>
       </body>
     </html>

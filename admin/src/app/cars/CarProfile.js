@@ -225,9 +225,12 @@ export default function CarProfile({
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
                 >
                   <option value="">Select category</option>
-                  <option value="SUV">SUV</option>
-                  <option value="Sedan">Sedan</option>
-                  <option value="Mini Van">Mini Van</option>
+                  <option value="economy">Economy</option>
+                  <option value="standard">Standard</option>
+                  <option value="first_class">First Class</option>
+                  <option value="standard_van">Standard Van</option>
+                  <option value="first_class_van">First Class Van</option>
+                  <option value="minibus">Minibus</option>
                 </select>
               ) : (
                 <div className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">

@@ -91,9 +91,12 @@
     "sar_currency": "ر.س"
   },
   "vehicles": {
-    "sedan": "سيدان",
-    "suv": "دفع رباعي",
-    "mini van": "ميني فان"
+    "economy": "اقتصادي",
+    "standard": "قياسي",
+    "first_class": "درجة أولى",
+    "standard_van": "فان قياسي",
+    "first_class_van": "فان درجة أولى",
+    "minibus": "حافلة صغيرة"
   },
   "validation": {
     "pickup_required": "موقع الركوب مطلوب",

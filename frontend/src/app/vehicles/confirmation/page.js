@@ -1,39 +1,75 @@
 "use client";
 
-import { Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import { CheckCircle2, Calendar, Clock, MapPin, Car, Users, Download, Home } from 'lucide-react';
+import { CheckCircle2, Calendar, Clock, Users, Car, Download, Home, Loader2 } from 'lucide-react';
+import { getBookingPublic } from '../../lib/booking';
+import { API_BASE_URL, API_ENDPOINTS } from '../../lib/constants';
 
 const BRAND_GRADIENT = 'linear-gradient(296.47deg, #005F56 -2.82%, #00B1C5 97.17%)';
 
-const VEHICLES = [
-  { id: 'economy',         name: 'Economy',         passengers: 3, luggage: 3, image: '/images/Standard Class Taxi.svg',       basePrice: 65.55,  discountPrice: null },
-  { id: 'standard',        name: 'Standard',        passengers: 3, luggage: 3, image: '/images/First Class Transfer.svg',      basePrice: 96.13,  discountPrice: 87.39 },
-  { id: 'first-class',     name: 'First Class',     passengers: 3, luggage: 3, image: '/images/SUV Limo Class.svg',            basePrice: 157.31, discountPrice: null },
-  { id: 'standard-van',    name: 'Standard Van',    passengers: 7, luggage: 7, image: '/images/Standard Van Transfer.svg',     basePrice: 102.82, discountPrice: 93.47 },
-  { id: 'first-class-van', name: 'First Class Van', passengers: 6, luggage: 6, image: '/images/First Class Van Transfer.svg',  basePrice: 157.68, discountPrice: null },
-  { id: 'minibus',         name: 'Minibus 12 Pax',  passengers: 12, luggage: 12, image: '/images/Minibus 12 Pax.svg',          basePrice: 220.00, discountPrice: null },
-];
+const VEHICLE_NAMES = {
+  economy: 'Economy', standard: 'Standard', first_class: 'First Class',
+  standard_van: 'Standard Van', first_class_van: 'First Class Van', minibus: 'Minibus 12 Pax',
+};
 
 function ConfirmationContent() {
   const searchParams = useSearchParams();
+  const bookingId = searchParams.get('bookingId');
 
-  const from       = searchParams.get('from')       || 'Origin';
-  const to         = searchParams.get('to')         || 'Destination';
-  const date       = searchParams.get('date')       || '';
-  const time       = searchParams.get('time')       || '';
-  const passengers = searchParams.get('passengers') || '1';
-  const vehicleId  = searchParams.get('vehicle')    || 'economy';
+  // Fallback values from URL params (in case the API call takes a moment)
+  const urlFrom       = searchParams.get('from')       || '';
+  const urlTo         = searchParams.get('to')         || '';
+  const urlDate       = searchParams.get('date')       || '';
+  const urlTime       = searchParams.get('time')       || '';
+  const urlPassengers = searchParams.get('passengers') || '1';
+  const urlVehicle    = searchParams.get('vehicle')    || '';
+  const urlFare       = searchParams.get('fare')       || '';
 
-  const vehicle = VEHICLES.find(v => v.id === vehicleId);
-  const price = vehicle ? (vehicle.discountPrice ?? vehicle.basePrice) : 0;
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(!!bookingId);
+
+  useEffect(() => {
+    if (!bookingId) return;
+
+    async function fetchBooking() {
+      try {
+        const res = await getBookingPublic(bookingId);
+        if (res.success && res.booking) {
+          setBooking(res.booking);
+        }
+      } catch (err) {
+        console.error('Failed to fetch booking:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBooking();
+  }, [bookingId]);
+
+  const from       = booking?.pickup       || urlFrom;
+  const to         = booking?.drop         || urlTo;
+  const date       = booking?.date         || urlDate;
+  const time       = booking?.time         || urlTime;
+  const passengers = booking?.no_of_passengers || urlPassengers;
+  const vehicleType = booking?.vehicle_type || urlVehicle;
+  const totalFare  = booking?.total_fare   ?? (urlFare ? parseFloat(urlFare) : 0);
+  const bookingRef = booking?._id
+    ? `KSA-${booking._id.slice(-6).toUpperCase()}`
+    : 'KSA-...';
 
   const formattedDate = date
     ? new Date(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     : '—';
 
-  const bookingRef = `KSA-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 text-[#00B1C5] animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,14 +105,8 @@ function ConfirmationContent() {
                 <div className="w-3 h-3 rounded-full bg-[#00B1C5]" />
               </div>
               <div className="flex-1 space-y-4">
-                <div>
-                  <p className="font-semibold text-gray-900">{from}</p>
-                  <p className="text-xs text-gray-500">Pickup</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900">{to}</p>
-                  <p className="text-xs text-gray-500">Drop-off</p>
-                </div>
+                <div><p className="font-semibold text-gray-900">{from}</p><p className="text-xs text-gray-500">Pickup</p></div>
+                <div><p className="font-semibold text-gray-900">{to}</p><p className="text-xs text-gray-500">Drop-off</p></div>
               </div>
             </div>
 
@@ -86,57 +116,44 @@ function ConfirmationContent() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-[#00B1C5]" />
-                <div>
-                  <p className="text-xs text-gray-500">Date</p>
-                  <p className="text-sm font-semibold text-gray-900">{formattedDate}</p>
-                </div>
+                <div><p className="text-xs text-gray-500">Date</p><p className="text-sm font-semibold text-gray-900">{formattedDate}</p></div>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-[#00B1C5]" />
-                <div>
-                  <p className="text-xs text-gray-500">Pickup time</p>
-                  <p className="text-sm font-semibold text-gray-900">{time || '—'}</p>
-                </div>
+                <div><p className="text-xs text-gray-500">Pickup time</p><p className="text-sm font-semibold text-gray-900">{time || '—'}</p></div>
               </div>
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-[#00B1C5]" />
-                <div>
-                  <p className="text-xs text-gray-500">Passengers</p>
-                  <p className="text-sm font-semibold text-gray-900">{passengers}</p>
-                </div>
+                <div><p className="text-xs text-gray-500">Passengers</p><p className="text-sm font-semibold text-gray-900">{passengers}</p></div>
               </div>
               <div className="flex items-center gap-2">
                 <Car className="h-4 w-4 text-[#00B1C5]" />
-                <div>
-                  <p className="text-xs text-gray-500">Vehicle</p>
-                  <p className="text-sm font-semibold text-gray-900">{vehicle?.name ?? '—'}</p>
-                </div>
+                <div><p className="text-xs text-gray-500">Vehicle</p><p className="text-sm font-semibold text-gray-900">{VEHICLE_NAMES[vehicleType] || vehicleType || '—'}</p></div>
               </div>
             </div>
           </div>
 
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-600">Total paid</span>
-            <span className="text-xl font-bold text-gray-900">SAR {price.toFixed(2)}</span>
+            <span className="text-sm font-medium text-gray-600">Total</span>
+            <span className="text-xl font-bold text-gray-900">SAR {totalFare.toFixed(2)}</span>
           </div>
         </div>
 
         {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <a
-            href="/home"
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl text-white text-sm font-bold transition-all hover:opacity-90"
-            style={{ background: BRAND_GRADIENT }}
-          >
-            <Home className="h-4 w-4" />
-            Back to Home
+          <a href="/" className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl text-white text-sm font-bold transition-all hover:opacity-90" style={{ background: BRAND_GRADIENT }}>
+            <Home className="h-4 w-4" /> Back to Home
           </a>
-          <button
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-[#005F56] text-[#005F56] text-sm font-bold hover:bg-[#005F56]/5 transition-colors"
-          >
-            <Download className="h-4 w-4" />
-            Download Receipt
-          </button>
+          {bookingId && (
+            <a
+              href={`${API_BASE_URL}${API_ENDPOINTS.BOOKING_RECEIPT(bookingId)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-[#005F56] text-[#005F56] text-sm font-bold hover:bg-[#005F56]/5 transition-colors"
+            >
+              <Download className="h-4 w-4" /> Download Receipt
+            </a>
+          )}
         </div>
       </div>
     </div>

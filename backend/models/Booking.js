@@ -5,12 +5,27 @@ const bookingSchema = new mongoose.Schema(
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      default: null,
+    },
+    service_type: {
+      type: String,
+      enum: ["transfer", "hourly"],
+      default: "transfer",
+    },
+    first_name: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    last_name: {
+      type: String,
+      trim: true,
+      default: "",
     },
     user_name: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
     contact_number: {
       type: String,
@@ -51,7 +66,14 @@ const bookingSchema = new mongoose.Schema(
     vehicle_type: {
       type: String,
       required: true,
-      enum: ["sedan", "suv", "luxury", "van", "mini van"],
+      enum: [
+        "economy",
+        "standard",
+        "first_class",
+        "standard_van",
+        "first_class_van",
+        "minibus",
+      ],
     },
     vehicle_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -79,8 +101,8 @@ const bookingSchema = new mongoose.Schema(
     },
     payment_method: {
       type: String,
-      enum: ["cash", "card"],
-      default: "cash",
+      enum: ["cash", "card", "paypal"],
+      default: "card",
     },
     status: {
       type: String,
@@ -91,6 +113,43 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       default: "",
       trim: true,
+    },
+    flight_number: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    child_seat: {
+      type: Boolean,
+      default: false,
+    },
+    driver_notes: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    meet_greet_name: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    is_round_trip: {
+      type: Boolean,
+      default: false,
+    },
+    return_date: {
+      type: Date,
+      default: null,
+    },
+    return_time: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    duration_hours: {
+      type: Number,
+      min: 1,
+      default: null,
     },
   },
   {

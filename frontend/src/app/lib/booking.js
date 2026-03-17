@@ -14,13 +14,26 @@ export const calculateFare = async (fareData) => {
   }
 };
 
-// Create a new booking
+// Create a new booking (works for both authenticated users and guests)
 export const createBooking = async (bookingData) => {
   try {
     const response = await apiClient.post(
       API_ENDPOINTS.CREATE_BOOKING,
-      bookingData
+      bookingData,
+      { includeAuth: !!apiClient.getAccessToken() }
     );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get a single booking by ID (public — used by confirmation page)
+export const getBookingPublic = async (id) => {
+  try {
+    const response = await apiClient.get(API_ENDPOINTS.GET_BOOKING(id), {
+      includeAuth: !!apiClient.getAccessToken(),
+    });
     return response;
   } catch (error) {
     throw error;

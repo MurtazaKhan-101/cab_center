@@ -118,8 +118,30 @@ const authorize = (...roles) => {
   };
 };
 
+// Sets req.user if a valid token is present, but allows the request through either way
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.header("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return next();
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (user && user.isVerified) {
+      req.user = user;
+    }
+  } catch {
+    // Token invalid/expired — proceed as guest
+  }
+  next();
+};
+
 module.exports = {
   authenticate,
   authorize,
   verifyRefreshToken,
+  optionalAuth,
 };

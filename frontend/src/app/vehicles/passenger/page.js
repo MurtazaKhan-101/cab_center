@@ -219,6 +219,14 @@ function PassengerContent() {
   const flightNumber = searchParams.get('flightNumber') || '';
   const childSeat    = searchParams.get('childSeat')    || '0';
   const driverNotes  = searchParams.get('driverNotes')  || '';
+  const serviceType  = searchParams.get('serviceType')  || 'transfer';
+  const distanceKm   = searchParams.get('distanceKm')   || '';
+  const durationMin  = searchParams.get('durationMin')  || '';
+  const fare         = searchParams.get('fare')         || '';
+  const duration     = searchParams.get('duration')     || '';
+  const isRoundTrip  = searchParams.get('isRoundTrip')  || '';
+  const returnDate   = searchParams.get('returnDate')   || '';
+  const returnTime   = searchParams.get('returnTime')   || '';
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -250,12 +258,18 @@ function PassengerContent() {
       from, to, date, time, passengers, vehicle,
       flightNumber, childSeat, driverNotes,
       firstName, lastName, email, phone: `${countryCode}${phone}`,
+      serviceType, distanceKm, durationMin, fare,
+      meetGreetName: meetGreetName,
     });
+    if (duration) params.set('duration', duration);
+    if (isRoundTrip) { params.set('isRoundTrip', isRoundTrip); params.set('returnDate', returnDate); params.set('returnTime', returnTime); }
     router.push(`/vehicles/payment?${params.toString()}`);
   };
 
   const handleBack = () => {
-    const params = new URLSearchParams({ from, to, date, time, passengers, vehicle });
+    const params = new URLSearchParams({ from, to, date, time, passengers, vehicle, serviceType, distanceKm, durationMin, fare });
+    if (duration) params.set('duration', duration);
+    if (isRoundTrip) { params.set('isRoundTrip', isRoundTrip); params.set('returnDate', returnDate); params.set('returnTime', returnTime); }
     router.push(`/vehicles/extras?${params.toString()}`);
   };
 

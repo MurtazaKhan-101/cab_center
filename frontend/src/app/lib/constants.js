@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
   MY_BOOKINGS: "/api/bookings/my-bookings",
   CANCEL_BOOKING: (id) => `/api/bookings/${id}/cancel`,
   GET_BOOKING: (id) => `/api/bookings/${id}`,
+  BOOKING_RECEIPT: (id) => `/api/bookings/${id}/receipt`,
   CALCULATE_FARE: "/api/bookings/calculate-fare",
 
   // Vehicle endpoints (Public)
@@ -67,11 +68,12 @@ export const BOOKING_STATUS = {
 
 // Vehicle Types
 export const VEHICLE_TYPES = {
-  SEDAN: "sedan",
-  SUV: "suv",
-  LUXURY: "luxury",
-  VAN: "van",
-  MINI: "mini",
+  ECONOMY: "economy",
+  STANDARD: "standard",
+  FIRST_CLASS: "first_class",
+  STANDARD_VAN: "standard_van",
+  FIRST_CLASS_VAN: "first_class_van",
+  MINIBUS: "minibus",
 };
 
 // Error Messages
