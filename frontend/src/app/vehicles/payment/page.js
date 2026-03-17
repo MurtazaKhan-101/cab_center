@@ -11,7 +11,7 @@ import {
 
 const BRAND_GRADIENT = 'linear-gradient(296.47deg, #005F56 -2.82%, #00B1C5 97.17%)';
 
-const STEPS = ['Vehicle', 'Extras', 'Passenger', 'Payment'];
+const STEPS = ['Vehicle', 'Extras', 'Passenger', 'Payment', 'Passport'];
 
 const VEHICLES = [
   { id: 'economy',         name: 'Economy',         passengers: 3, luggage: 3, image: '/images/Standard Class Taxi.svg',       basePrice: 65.55,  discountPrice: null },
@@ -249,7 +249,8 @@ function PaymentContent() {
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
-      router.push('/vehicles/confirmation?' + new URLSearchParams({ from, to, date, time, passengers, vehicle }).toString());
+      const params = new URLSearchParams(Object.fromEntries(searchParams.entries()));
+      router.push(`/vehicles/passport?${params.toString()}`);
     }, 2000);
   };
 

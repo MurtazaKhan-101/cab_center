@@ -82,7 +82,7 @@ const VEHICLES = [
   },
 ];
 
-const STEPS = ['Vehicle', 'Extras', 'Passenger', 'Payment'];
+const STEPS = ['Vehicle', 'Extras', 'Passenger', 'Payment', 'Passport'];
 
 
 

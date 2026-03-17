@@ -285,24 +285,14 @@ const HeaderComponent = ({ user, onLogout, loading = false, isAuthenticated = fa
             )}
           </nav>
 
-          {/* Right side: Language + User */}
-          <div className="hidden lg:flex items-center gap-3">
+          {/* Right side: Language + User (hidden for now) */}
+          {/* <div className="hidden lg:flex items-center gap-3">
             <LanguageSwitcher />
             {renderUserSection()}
-          </div>
+          </div> */}
 
           {/* Tablet Controls */}
           <div className="hidden md:flex lg:hidden items-center space-x-3">
-            <LanguageSwitcher compact />
-            {isAuthenticated && user && (
-              <button
-                onClick={handleDesktopLogout}
-                className="bg-white text-[#005F56] px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
-                disabled={isLoggingOut}
-              >
-                {isLoggingOut ? 'Logging out...' : 'Logout'}
-              </button>
-            )}
             <button onClick={toggleMenu} className="text-white/70 hover:text-white p-2 rounded-lg transition-colors" aria-expanded={isMenuOpen} aria-label="Toggle menu">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMenuOpen
@@ -314,7 +304,6 @@ const HeaderComponent = ({ user, onLogout, loading = false, isAuthenticated = fa
 
           {/* Mobile Controls */}
           <div className="md:hidden flex items-center space-x-2">
-            <LanguageSwitcher compact />
             <button onClick={toggleMenu} className="text-white/70 hover:text-white p-2 rounded-lg transition-colors" aria-expanded={isMenuOpen} aria-label="Toggle menu">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMenuOpen
@@ -347,9 +336,10 @@ const HeaderComponent = ({ user, onLogout, loading = false, isAuthenticated = fa
                 </div>
               </>
             )}
-            <div className="border-t border-white/10 pt-4 mt-2">
+            {/* Auth section hidden for now */}
+            {/* <div className="border-t border-white/10 pt-4 mt-2">
               {renderMobileUserSection()}
-            </div>
+            </div> */}
           </div>
         )}
       </div>
